@@ -7,11 +7,11 @@
  (function () {
  	// create a local scope so there is no change of name conflicts
 
- 	var cell_states = [];
+ 	var cell_states = []; // index is the tick number and the contents are the visual states of cells current at that time
 
  	var initialize = function () {
- 	   	var cell_numbers = [];
- 	   	var current_cell_states = [];
+ 	   	var cell_numbers = []; // ids of cells currently alive
+ 	   	var current_cell_states = []; // the graphical state of each current cell
  	   	var tick, events;
         if (typeof l === 'undefined') { // the log has the short name 'l' to keep down bandwidth and file sizes
         	document.write("Simulation is not finished. Please refresh this page later.");
@@ -28,6 +28,7 @@
                          index = cell_numbers.indexOf(event.removed);
                          cell_numbers = cell_numbers.splice(index, 1);
                      } else if (event.changed) {
+                         event.changed.who = event.who;
                          current_cell_states[event.who] = event.changed;
                      }
                 });
@@ -52,6 +53,7 @@
  	var display_cell_2D = function (cell, scale, radius, color) {
  	    context_2D.fillStyle = color;
  	    context_2D.beginPath();
+ 	    // adjust coordinates to avoid negative coordinates and scale to a larger size
  	    context_2D.arc((1+cell.x-minimum_x)*scale, (1+maximum_y-cell.y)*scale, radius*scale, 0, Math.PI*2);
  	    context_2D.fill();
  	    context_2D.stroke();
@@ -76,10 +78,12 @@
  	        });
             tick++;
  	        if (skip_unchanging_frames) {
+ 	            // find next time where an event was logged
                 while (l[tick] === undefined && tick < l.length) {
                     tick++;
                 }
  	        } else if (skip_every_n_frames) {
+ 	            // already added 1 so skip 1 less than skip_every_n_frames
  	            tick += skip_every_n_frames-1;
  	        }
  	        if (cell_states[tick]) {
@@ -90,6 +94,7 @@
                            frame_duration);
  	        }
         };
+        // set canvas size as just a little bit bigger than needed
         canvas.width  = (2+maximum_x-minimum_x) *scale;
         canvas.height = (2+maximum_y-minimum_y)*scale;
         display_frame();
@@ -97,6 +102,7 @@
 
  	var canvas, context_2D, display_cell;
 
+    // initialize when the page has been loaded
  	document.addEventListener('DOMContentLoaded', initialize);
 
  }());
