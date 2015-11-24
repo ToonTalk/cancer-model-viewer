@@ -1,0 +1,11 @@
+ /**
+ * Implements a style sheet for results from running the Oxford cancer model
+ * Authors: Ken Kahn
+ * License: to be determined
+ */
+
+
+body {
+    font-family: "Tahoma", "Trebuchet MS";
+    font-size: 1.1em;
+}
