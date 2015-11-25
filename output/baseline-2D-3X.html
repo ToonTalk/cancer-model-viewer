@@ -1,0 +1,890 @@
+<html>
+<head>
+<meta charset='utf-8' />
+<link rel='stylesheet' media='all' href='../cancer-model.css' />
+<title>Results from running cancer simulation</title>
+<script src='../cancer-model.js'></script>
+<script>
+var l = [];
+var replicates = [];
+var running_3D = false;
+
+l[1]=
+[{added: 5},
+{added: 37},
+{added: 3},
+{added: 4},
+{added: 45},
+{added: 39},
+{added: 40},
+{added: 18},
+{added: 26},
+{added: 21},
+{added: 41},
+{added: 48},
+{added: 28},
+{added: 15},
+{added: 9},
+{added: 13},
+{added: 20},
+{added: 35},
+{added: 30},
+{added: 11},
+{added: 43},
+{added: 19},
+{added: 47},
+{added: 12},
+{added: 32},
+{added: 50},
+{added: 8},
+{added: 42},
+{added: 33},
+{added: 27},
+{added: 29},
+{added: 2},
+{added: 34},
+{added: 17},
+{added: 46},
+{added: 25},
+{added: 24},
+{added: 7},
+{added: 31},
+{added: 23},
+{added: 38},
+{added: 44},
+{added: 1},
+{added: 6},
+{added: 16},
+{added: 14},
+{added: 10},
+{added: 49},
+{added: 36},
+{added: 22},
+ {who: 34, changed: {x: 1, y: 0}},
+ {who: 35, changed: {x: -2, y: -1}},
+ {who: 19, changed: {x: 3, y: 1}},
+ {who: 37, changed: {x: 4, y: -2}},
+ {who: 10, changed: {x: -5, y: -2}},
+ {who: 7, changed: {x: -3, y: -1}},
+ {who: 27, changed: {x: -1, y: 1}},
+ {who: 25, changed: {x: -2, y: 1}},
+ {who: 3, changed: {x: 3, y: -1}},
+ {who: 41, changed: {x: -3, y: 1}},
+ {who: 22, changed: {x: -2, y: -2}},
+ {who: 12, changed: {x: 4, y: -1}},
+ {who: 14, changed: {x: -5, y: -1}},
+ {who: 4, changed: {x: -2, y: -3}},
+ {who: 40, changed: {x: 2, y: -2}},
+ {who: 45, changed: {x: 2, y: -3}},
+ {who: 15, changed: {x: -3, y: -3}},
+ {who: 33, changed: {x: -5, y: -3}},
+ {who: 13, changed: {x: 2, y: -1}},
+ {who: 44, changed: {x: 0, y: -1}},
+ {who: 43, changed: {x: 3, y: -3}},
+ {who: 24, changed: {x: 1, y: -3}},
+ {who: 28, changed: {x: -1, y: -2}},
+ {who: 17, changed: {x: -4, y: 0}},
+ {who: 18, changed: {x: -4, y: -3}},
+ {who: 6, changed: {x: -4, y: 1}},
+ {who: 26, changed: {x: -3, y: 0}},
+ {who: 39, changed: {x: -5, y: 0}},
+ {who: 32, changed: {x: 1, y: -1}},
+ {who: 47, changed: {x: -2, y: 0}},
+ {who: 38, changed: {x: 2, y: 1}},
+ {who: 29, changed: {x: -4, y: -1}},
+ {who: 36, changed: {x: 0, y: -3}},
+ {who: 11, changed: {x: 0, y: 1}},
+ {who: 46, changed: {x: -3, y: -2}},
+ {who: 5, changed: {x: -1, y: -1}},
+ {who: 50, changed: {x: 4, y: 1}},
+ {who: 1, changed: {x: 3, y: -2}},
+ {who: 48, changed: {x: 0, y: 0}},
+ {who: 49, changed: {x: 1, y: 1}},
+ {who: 8, changed: {x: 3, y: 0}},
+ {who: 21, changed: {x: 1, y: -2}},
+ {who: 30, changed: {x: 2, y: 0}},
+ {who: 31, changed: {x: 0, y: -2}},
+ {who: 16, changed: {x: 4, y: 0}},
+ {who: 2, changed: {x: -4, y: -2}},
+ {who: 20, changed: {x: -1, y: 0}},
+ {who: 23, changed: {x: -5, y: 1}},
+ {who: 42, changed: {x: 4, y: -3}},
+ {who: 9, changed: {x: -1, y: -3}}];
+l[1159]=
+[{added: 2955},
+ {who: 2955, changed: {x: 1, y: -4}}];
+l[1354]=
+[{added: 3014},
+ {who: 3014, changed: {x: 5, y: 2}}];
+l[1387]=
+[{added: 3073},
+ {who: 45, changed: {x: 2, y: -4}},
+ {who: 40, changed: {x: 2, y: -3}},
+ {who: 31, changed: {x: 1, y: -2}},
+ {who: 21, changed: {x: 2, y: -2}},
+ {who: 3073, changed: {x: 0, y: -2}}];
+l[1940]=
+[{added: 3132},
+ {who: 3132, changed: {x: 2, y: -1}},
+ {who: 13, changed: {x: 3, y: -1}},
+ {who: 12, changed: {x: 5, y: -1}},
+ {who: 3, changed: {x: 4, y: -1}}];
+l[2183]=
+[{added: 3191},
+ {who: 13, changed: {x: 3, y: -2}},
+ {who: 1, changed: {x: 3, y: -1}},
+ {who: 3191, changed: {x: 4, y: -1}},
+ {who: 3, changed: {x: 5, y: 0}}];
+l[2385]=
+[{added: 3250},
+ {who: 3250, changed: {x: 2, y: -1}},
+ {who: 3132, changed: {x: 2, y: -2}},
+ {who: 21, changed: {x: 2, y: -3}},
+ {who: 40, changed: {x: 3, y: -4}}];
+l[2564]=
+[{added: 3309},
+ {who: 3309, changed: {x: -2, y: 2}}];
+l[2617]=
+[{added: 3368},
+ {who: 3368, changed: {x: 5, y: -2}}];
+l[5383]=
+[{added: 3427},
+ {who: 8, changed: {x: 4, y: -1}},
+ {who: 19, changed: {x: 4, y: 2}},
+ {who: 3427, changed: {x: 3, y: -2}},
+ {who: 3191, changed: {x: 3, y: -1}},
+ {who: 3250, changed: {x: 1, y: -1}},
+ {who: 30, changed: {x: 3, y: 1}},
+ {who: 32, changed: {x: 2, y: -1}},
+ {who: 13, changed: {x: 3, y: 0}},
+ {who: 1, changed: {x: 2, y: 0}}];
+l[5585]=
+[{added: 3486},
+ {who: 45, changed: {x: 1, y: -5}},
+ {who: 3486, changed: {x: 2, y: -4}}];
+l[5764]=
+[{added: 3545},
+ {who: 3545, changed: {x: -3, y: 2}}];
+l[5817]=
+[{added: 3604},
+ {who: 3604, changed: {x: 4, y: -1}},
+ {who: 16, changed: {x: 5, y: 1}},
+ {who: 8, changed: {x: 4, y: 0}}];
+l[8583]=
+[{added: 3663},
+ {who: 3663, changed: {x: 4, y: 1}},
+ {who: 50, changed: {x: 3, y: 2}}];
+l[8785]=
+[{added: 3722},
+ {who: 3132, changed: {x: -1, y: -1}},
+ {who: 3250, changed: {x: 2, y: -1}},
+ {who: 31, changed: {x: 2, y: -2}},
+ {who: 3722, changed: {x: 0, y: -2}},
+ {who: 22, changed: {x: -2, y: -3}},
+ {who: 5, changed: {x: 1, y: -1}},
+ {who: 28, changed: {x: -2, y: -2}},
+ {who: 3073, changed: {x: -1, y: -2}},
+ {who: 32, changed: {x: 1, y: -2}},
+ {who: 4, changed: {x: -1, y: -4}}];
+l[8964]=
+[{added: 3781},
+ {who: 3781, changed: {x: -4, y: 2}}];
+l[9017]=
+[{added: 3840},
+ {who: 31, changed: {x: 3, y: -2}},
+ {who: 3840, changed: {x: 3, y: 0}},
+ {who: 3191, changed: {x: 3, y: -3}},
+ {who: 3427, changed: {x: 2, y: -2}},
+ {who: 43, changed: {x: 4, y: -4}},
+ {who: 13, changed: {x: 3, y: -1}}];
+replicates[2] = l;
+l = [];
+
+l[1]=
+[{added: 32},
+{added: 47},
+{added: 46},
+{added: 49},
+{added: 6},
+{added: 14},
+{added: 23},
+{added: 25},
+{added: 28},
+{added: 27},
+{added: 42},
+{added: 17},
+{added: 36},
+{added: 3},
+{added: 31},
+{added: 38},
+{added: 26},
+{added: 34},
+{added: 35},
+{added: 20},
+{added: 9},
+{added: 1},
+{added: 15},
+{added: 50},
+{added: 4},
+{added: 30},
+{added: 10},
+{added: 7},
+{added: 8},
+{added: 33},
+{added: 40},
+{added: 12},
+{added: 43},
+{added: 11},
+{added: 22},
+{added: 21},
+{added: 16},
+{added: 48},
+{added: 24},
+{added: 19},
+{added: 5},
+{added: 44},
+{added: 45},
+{added: 18},
+{added: 13},
+{added: 2},
+{added: 37},
+{added: 41},
+{added: 29},
+{added: 39},
+ {who: 47, changed: {x: 2, y: 0}},
+ {who: 22, changed: {x: -4, y: -1}},
+ {who: 32, changed: {x: 2, y: -1}},
+ {who: 50, changed: {x: 4, y: -2}},
+ {who: 15, changed: {x: -1, y: -1}},
+ {who: 14, changed: {x: -5, y: -3}},
+ {who: 35, changed: {x: -5, y: -2}},
+ {who: 4, changed: {x: -1, y: 0}},
+ {who: 43, changed: {x: 1, y: 1}},
+ {who: 44, changed: {x: 0, y: -1}},
+ {who: 17, changed: {x: -4, y: -2}},
+ {who: 39, changed: {x: 1, y: -1}},
+ {who: 18, changed: {x: 4, y: 1}},
+ {who: 29, changed: {x: -1, y: 1}},
+ {who: 28, changed: {x: -3, y: -3}},
+ {who: 8, changed: {x: -3, y: 0}},
+ {who: 1, changed: {x: -1, y: -3}},
+ {who: 34, changed: {x: -2, y: -3}},
+ {who: 10, changed: {x: -4, y: 0}},
+ {who: 24, changed: {x: -5, y: 0}},
+ {who: 13, changed: {x: -2, y: -1}},
+ {who: 7, changed: {x: 0, y: -3}},
+ {who: 38, changed: {x: 4, y: -1}},
+ {who: 20, changed: {x: -1, y: -2}},
+ {who: 25, changed: {x: -3, y: 1}},
+ {who: 30, changed: {x: 4, y: 0}},
+ {who: 48, changed: {x: 0, y: 1}},
+ {who: 23, changed: {x: -2, y: -2}},
+ {who: 40, changed: {x: -4, y: 1}},
+ {who: 21, changed: {x: -5, y: -1}},
+ {who: 41, changed: {x: 3, y: -1}},
+ {who: 36, changed: {x: 3, y: 1}},
+ {who: 31, changed: {x: -3, y: -2}},
+ {who: 26, changed: {x: 2, y: 1}},
+ {who: 2, changed: {x: 1, y: 0}},
+ {who: 3, changed: {x: 3, y: -3}},
+ {who: 49, changed: {x: 1, y: -3}},
+ {who: 27, changed: {x: 0, y: -2}},
+ {who: 16, changed: {x: 0, y: 0}},
+ {who: 45, changed: {x: -2, y: 0}},
+ {who: 33, changed: {x: 2, y: -2}},
+ {who: 5, changed: {x: 3, y: 0}},
+ {who: 42, changed: {x: -3, y: -1}},
+ {who: 9, changed: {x: 4, y: -3}},
+ {who: 12, changed: {x: -5, y: 1}},
+ {who: 6, changed: {x: -4, y: -3}},
+ {who: 19, changed: {x: 1, y: -2}},
+ {who: 11, changed: {x: 2, y: -3}},
+ {who: 37, changed: {x: -2, y: 1}},
+ {who: 46, changed: {x: 3, y: -2}}];
+l[1506]=
+[{added: 2955},
+ {who: 2955, changed: {x: -6, y: 1}}];
+l[1678]=
+[{added: 3014},
+ {who: 3014, changed: {x: 3, y: 2}}];
+l[2027]=
+[{added: 3073},
+ {who: 2, changed: {x: 2, y: 0}},
+ {who: 16, changed: {x: -1, y: 0}},
+ {who: 3073, changed: {x: 0, y: 0}},
+ {who: 47, changed: {x: 2, y: 1}},
+ {who: 4, changed: {x: 1, y: 0}},
+ {who: 26, changed: {x: 1, y: 2}}];
+l[2172]=
+[{added: 3132},
+ {who: 3132, changed: {x: 3, y: -4}}];
+l[2631]=
+[{added: 3191},
+ {who: 3191, changed: {x: 1, y: -2}},
+ {who: 27, changed: {x: -1, y: -2}},
+ {who: 11, changed: {x: 1, y: -4}},
+ {who: 19, changed: {x: 2, y: -2}},
+ {who: 33, changed: {x: 2, y: -3}},
+ {who: 20, changed: {x: 0, y: -2}}];
+l[2887]=
+[{added: 3250},
+ {who: 42, changed: {x: -4, y: -1}},
+ {who: 21, changed: {x: -6, y: 0}},
+ {who: 3250, changed: {x: -3, y: -1}},
+ {who: 22, changed: {x: -5, y: -1}}];
+l[2892]=
+[{added: 3309},
+ {who: 3309, changed: {x: 0, y: -4}}];
+l[3020]=
+[{added: 3368},
+ {who: 3368, changed: {x: -6, y: -2}}];
+l[3454]=
+[{added: 3427},
+ {who: 28, changed: {x: -4, y: -4}},
+ {who: 3427, changed: {x: -2, y: -2}},
+ {who: 31, changed: {x: -3, y: -3}},
+ {who: 23, changed: {x: -3, y: -2}}];
+l[3718]=
+[{added: 3486},
+ {who: 3486, changed: {x: 2, y: -4}}];
+l[4706]=
+[{added: 3545},
+ {who: 3545, changed: {x: -6, y: -1}}];
+l[5372]=
+[{added: 3604},
+ {who: 3604, changed: {x: 4, y: -4}}];
+l[5397]=
+[{added: 3663},
+ {who: 3663, changed: {x: -6, y: -3}}];
+l[5831]=
+[{added: 3722},
+ {who: 4, changed: {x: 0, y: 0}},
+ {who: 3722, changed: {x: 0, y: -1}},
+ {who: 3073, changed: {x: 2, y: 0}},
+ {who: 2, changed: {x: 1, y: 0}},
+ {who: 3486, changed: {x: 2, y: -5}},
+ {who: 44, changed: {x: 1, y: -1}},
+ {who: 33, changed: {x: 2, y: -4}},
+ {who: 32, changed: {x: 2, y: -2}},
+ {who: 39, changed: {x: 2, y: -1}},
+ {who: 19, changed: {x: 2, y: -3}}];
+l[6087]=
+[{added: 3781},
+ {who: 3427, changed: {x: -2, y: -1}},
+ {who: 13, changed: {x: -3, y: 0}},
+ {who: 16, changed: {x: -2, y: 0}},
+ {who: 8, changed: {x: -3, y: 1}},
+ {who: 45, changed: {x: -1, y: 0}},
+ {who: 3781, changed: {x: -2, y: -2}},
+ {who: 25, changed: {x: -3, y: 2}}];
+l[6220]=
+[{added: 3840},
+ {who: 3545, changed: {x: -7, y: -2}},
+ {who: 3840, changed: {x: -6, y: -1}}];
+l[6241]=
+[{added: 3899},
+ {who: 3899, changed: {x: 3, y: -6}}];
+l[6654]=
+[{added: 3958},
+ {who: 3958, changed: {x: -2, y: -4}}];
+l[6918]=
+[{added: 4017},
+ {who: 33, changed: {x: 3, y: -5}},
+ {who: 4017, changed: {x: 2, y: -4}},
+ {who: 3, changed: {x: 2, y: -3}},
+ {who: 19, changed: {x: 3, y: -3}}];
+l[7906]=
+[{added: 4076},
+ {who: 17, changed: {x: -5, y: -2}},
+ {who: 4076, changed: {x: -5, y: -1}},
+ {who: 35, changed: {x: -4, y: -2}},
+ {who: 3368, changed: {x: -7, y: -3}},
+ {who: 22, changed: {x: -6, y: -2}}];
+l[8572]=
+[{added: 4135},
+ {who: 7, changed: {x: -1, y: -4}},
+ {who: 49, changed: {x: 2, y: -3}},
+ {who: 4135, changed: {x: 0, y: -3}},
+ {who: 3, changed: {x: 1, y: -3}}];
+l[8597]=
+[{added: 4194},
+ {who: 4194, changed: {x: -7, y: -4}}];
+l[8824]=
+[{added: 4253},
+ {who: 4253, changed: {x: 0, y: -2}},
+ {who: 23, changed: {x: -2, y: -2}},
+ {who: 20, changed: {x: -2, y: -3}},
+ {who: 34, changed: {x: -3, y: -4}},
+ {who: 27, changed: {x: -1, y: -3}},
+ {who: 1, changed: {x: -1, y: -2}},
+ {who: 3781, changed: {x: -3, y: -2}}];
+l[9287]=
+[{added: 4312},
+ {who: 8, changed: {x: -4, y: 2}},
+ {who: 4312, changed: {x: -3, y: 1}}];
+l[9420]=
+[{added: 4371},
+ {who: 4371, changed: {x: -7, y: -1}}];
+l[9441]=
+[{added: 4430},
+ {who: 4430, changed: {x: 1, y: -6}}];
+l[9510]=
+[{added: 4489},
+ {who: 4489, changed: {x: -7, y: 0}}];
+l[9854]=
+[{added: 4548},
+ {who: 4548, changed: {x: -2, y: -3}},
+ {who: 11, changed: {x: 1, y: -5}},
+ {who: 4253, changed: {x: 0, y: -1}},
+ {who: 20, changed: {x: 1, y: -3}},
+ {who: 3722, changed: {x: 0, y: -2}},
+ {who: 3, changed: {x: 1, y: -4}},
+ {who: 1, changed: {x: 0, y: -3}},
+ {who: 4135, changed: {x: -1, y: -2}}];
+l[9888]=
+[{added: 4607},
+ {who: 4607, changed: {x: 4, y: 0}},
+ {who: 30, changed: {x: 5, y: 1}}];
+replicates[1] = l;
+l = [];
+
+l[1]=
+[{added: 50},
+{added: 14},
+{added: 18},
+{added: 25},
+{added: 38},
+{added: 40},
+{added: 1},
+{added: 39},
+{added: 28},
+{added: 49},
+{added: 48},
+{added: 10},
+{added: 9},
+{added: 34},
+{added: 30},
+{added: 46},
+{added: 23},
+{added: 3},
+{added: 44},
+{added: 35},
+{added: 15},
+{added: 20},
+{added: 41},
+{added: 36},
+{added: 24},
+{added: 26},
+{added: 37},
+{added: 7},
+{added: 47},
+{added: 33},
+{added: 8},
+{added: 16},
+{added: 11},
+{added: 42},
+{added: 45},
+{added: 43},
+{added: 22},
+{added: 2},
+{added: 6},
+{added: 13},
+{added: 19},
+{added: 31},
+{added: 4},
+{added: 12},
+{added: 17},
+{added: 21},
+{added: 32},
+{added: 29},
+{added: 27},
+{added: 5},
+ {who: 12, changed: {x: 2, y: -2}},
+ {who: 3, changed: {x: -4, y: -3}},
+ {who: 39, changed: {x: 2, y: -3}},
+ {who: 4, changed: {x: -2, y: -3}},
+ {who: 42, changed: {x: -4, y: 1}},
+ {who: 25, changed: {x: 2, y: 0}},
+ {who: 26, changed: {x: 1, y: -1}},
+ {who: 2, changed: {x: -1, y: -2}},
+ {who: 13, changed: {x: -3, y: -1}},
+ {who: 47, changed: {x: 0, y: 0}},
+ {who: 1, changed: {x: 4, y: -2}},
+ {who: 7, changed: {x: 3, y: -1}},
+ {who: 38, changed: {x: -4, y: 0}},
+ {who: 41, changed: {x: 4, y: 0}},
+ {who: 11, changed: {x: 4, y: 1}},
+ {who: 33, changed: {x: 4, y: -3}},
+ {who: 14, changed: {x: 0, y: -1}},
+ {who: 23, changed: {x: -5, y: 0}},
+ {who: 16, changed: {x: -5, y: -2}},
+ {who: 43, changed: {x: 0, y: -3}},
+ {who: 22, changed: {x: 1, y: -2}},
+ {who: 34, changed: {x: -1, y: 1}},
+ {who: 15, changed: {x: -5, y: 1}},
+ {who: 18, changed: {x: 1, y: 1}},
+ {who: 8, changed: {x: -2, y: -1}},
+ {who: 17, changed: {x: 0, y: -2}},
+ {who: 6, changed: {x: 3, y: 1}},
+ {who: 32, changed: {x: 3, y: 0}},
+ {who: 10, changed: {x: -3, y: 0}},
+ {who: 48, changed: {x: 0, y: 1}},
+ {who: 44, changed: {x: -5, y: -3}},
+ {who: 5, changed: {x: 1, y: -3}},
+ {who: 31, changed: {x: 3, y: -2}},
+ {who: 30, changed: {x: 3, y: -3}},
+ {who: 35, changed: {x: -2, y: 0}},
+ {who: 40, changed: {x: -1, y: -1}},
+ {who: 50, changed: {x: -2, y: 1}},
+ {who: 45, changed: {x: -1, y: 0}},
+ {who: 21, changed: {x: -3, y: -3}},
+ {who: 37, changed: {x: -3, y: 1}},
+ {who: 19, changed: {x: -2, y: -2}},
+ {who: 49, changed: {x: -4, y: -2}},
+ {who: 46, changed: {x: 4, y: -1}},
+ {who: 24, changed: {x: 2, y: -1}},
+ {who: 27, changed: {x: -3, y: -2}},
+ {who: 29, changed: {x: -1, y: -3}},
+ {who: 28, changed: {x: 1, y: 0}},
+ {who: 9, changed: {x: -5, y: -1}},
+ {who: 36, changed: {x: 2, y: 1}},
+ {who: 20, changed: {x: -4, y: -1}}];
+l[580]=
+[{added: 2955},
+ {who: 2955, changed: {x: 1, y: -4}}];
+l[1119]=
+[{added: 3014},
+ {who: 43, changed: {x: -1, y: -4}},
+ {who: 17, changed: {x: 0, y: -3}},
+ {who: 3014, changed: {x: 0, y: -2}}];
+l[1174]=
+[{added: 3073},
+ {who: 3073, changed: {x: -6, y: 0}}];
+l[1316]=
+[{added: 3132},
+ {who: 3132, changed: {x: 0, y: -4}}];
+l[1804]=
+[{added: 3191},
+ {who: 24, changed: {x: 2, y: -2}},
+ {who: 3191, changed: {x: 1, y: 0}},
+ {who: 12, changed: {x: 2, y: -1}},
+ {who: 28, changed: {x: 3, y: 0}},
+ {who: 36, changed: {x: 2, y: 2}},
+ {who: 32, changed: {x: 2, y: 0}},
+ {who: 25, changed: {x: 2, y: 1}}];
+l[1968]=
+[{added: 3250},
+ {who: 21, changed: {x: -4, y: -4}},
+ {who: 3250, changed: {x: -3, y: -2}},
+ {who: 27, changed: {x: -3, y: -3}}];
+l[2308]=
+[{added: 3309},
+ {who: 3309, changed: {x: 4, y: 2}}];
+l[2871]=
+[{added: 3368},
+ {who: 3368, changed: {x: -5, y: -4}}];
+l[3040]=
+[{added: 3427},
+ {who: 3427, changed: {x: 5, y: -3}}];
+l[3405]=
+[{added: 3486},
+ {who: 27, changed: {x: -3, y: -4}},
+ {who: 3486, changed: {x: -3, y: -2}},
+ {who: 3250, changed: {x: -3, y: -3}}];
+l[3780]=
+[{added: 3545},
+ {who: 3545, changed: {x: 2, y: -4}}];
+l[4319]=
+[{added: 3604},
+ {who: 3604, changed: {x: 0, y: 0}},
+ {who: 18, changed: {x: 1, y: 2}},
+ {who: 47, changed: {x: 1, y: 0}},
+ {who: 3191, changed: {x: 1, y: 1}}];
+l[4374]=
+[{added: 3663},
+ {who: 3663, changed: {x: -6, y: -1}}];
+l[4516]=
+[{added: 3722},
+ {who: 29, changed: {x: -2, y: -4}},
+ {who: 3722, changed: {x: -1, y: -3}}];
+l[5561]=
+[{added: 3781},
+ {who: 3781, changed: {x: 6, y: -4}}];
+l[6240]=
+[{added: 3840},
+ {who: 3840, changed: {x: 5, y: -2}}];
+l[6980]=
+[{added: 3899},
+ {who: 3899, changed: {x: 1, y: -4}},
+ {who: 2955, changed: {x: 1, y: -5}}];
+l[7519]=
+[{added: 3958},
+ {who: 4, changed: {x: -3, y: -3}},
+ {who: 3722, changed: {x: -2, y: -3}},
+ {who: 27, changed: {x: -2, y: -5}},
+ {who: 3250, changed: {x: -3, y: -4}},
+ {who: 3958, changed: {x: 0, y: -2}},
+ {who: 17, changed: {x: -1, y: -3}},
+ {who: 3014, changed: {x: 0, y: -3}}];
+l[7574]=
+[{added: 4017},
+ {who: 4017, changed: {x: -6, y: 1}}];
+l[8761]=
+[{added: 4076},
+ {who: 4076, changed: {x: 6, y: -3}}];
+replicates[0] = l;
+l = [];
+
+l[1]=
+[{added: 31},
+{added: 40},
+{added: 27},
+{added: 4},
+{added: 13},
+{added: 14},
+{added: 36},
+{added: 38},
+{added: 50},
+{added: 29},
+{added: 5},
+{added: 18},
+{added: 42},
+{added: 33},
+{added: 48},
+{added: 8},
+{added: 15},
+{added: 43},
+{added: 34},
+{added: 44},
+{added: 49},
+{added: 37},
+{added: 46},
+{added: 26},
+{added: 21},
+{added: 24},
+{added: 23},
+{added: 35},
+{added: 30},
+{added: 1},
+{added: 45},
+{added: 28},
+{added: 6},
+{added: 41},
+{added: 17},
+{added: 25},
+{added: 9},
+{added: 19},
+{added: 7},
+{added: 2},
+{added: 32},
+{added: 22},
+{added: 39},
+{added: 20},
+{added: 3},
+{added: 10},
+{added: 47},
+{added: 11},
+{added: 16},
+{added: 12},
+ {who: 3, changed: {x: 0, y: -1}},
+ {who: 9, changed: {x: -4, y: -3}},
+ {who: 15, changed: {x: 0, y: -3}},
+ {who: 34, changed: {x: 4, y: 0}},
+ {who: 32, changed: {x: 2, y: 1}},
+ {who: 11, changed: {x: 3, y: 0}},
+ {who: 19, changed: {x: -1, y: 0}},
+ {who: 33, changed: {x: -3, y: -2}},
+ {who: 39, changed: {x: 1, y: 1}},
+ {who: 12, changed: {x: 3, y: -3}},
+ {who: 28, changed: {x: -4, y: 0}},
+ {who: 45, changed: {x: 4, y: -2}},
+ {who: 30, changed: {x: -2, y: -3}},
+ {who: 10, changed: {x: 0, y: -2}},
+ {who: 40, changed: {x: -5, y: 0}},
+ {who: 20, changed: {x: -2, y: 0}},
+ {who: 31, changed: {x: 1, y: 0}},
+ {who: 37, changed: {x: 2, y: -1}},
+ {who: 8, changed: {x: -3, y: -1}},
+ {who: 21, changed: {x: 1, y: -2}},
+ {who: 2, changed: {x: -5, y: -2}},
+ {who: 35, changed: {x: -4, y: -2}},
+ {who: 47, changed: {x: -1, y: -1}},
+ {who: 36, changed: {x: 2, y: -3}},
+ {who: 14, changed: {x: -2, y: 1}},
+ {who: 1, changed: {x: -2, y: -1}},
+ {who: 24, changed: {x: 4, y: 1}},
+ {who: 16, changed: {x: 0, y: 1}},
+ {who: 6, changed: {x: -3, y: 1}},
+ {who: 25, changed: {x: -1, y: 1}},
+ {who: 50, changed: {x: -1, y: -2}},
+ {who: 5, changed: {x: -3, y: -3}},
+ {who: 18, changed: {x: 4, y: -3}},
+ {who: 41, changed: {x: 2, y: 0}},
+ {who: 38, changed: {x: -2, y: -2}},
+ {who: 46, changed: {x: 1, y: -3}},
+ {who: 42, changed: {x: 3, y: 1}},
+ {who: 26, changed: {x: -3, y: 0}},
+ {who: 23, changed: {x: -5, y: 1}},
+ {who: 44, changed: {x: -4, y: 1}},
+ {who: 7, changed: {x: 1, y: -1}},
+ {who: 49, changed: {x: 4, y: -1}},
+ {who: 22, changed: {x: 3, y: -2}},
+ {who: 43, changed: {x: 2, y: -2}},
+ {who: 13, changed: {x: -4, y: -1}},
+ {who: 48, changed: {x: 3, y: -1}},
+ {who: 17, changed: {x: -5, y: -3}},
+ {who: 29, changed: {x: -5, y: -1}},
+ {who: 4, changed: {x: 0, y: 0}},
+ {who: 27, changed: {x: -1, y: -3}}];
+l[506]=
+[{added: 2955},
+ {who: 2955, changed: {x: 0, y: -4}}];
+l[739]=
+[{added: 3014},
+ {who: 3014, changed: {x: 0, y: -3}},
+ {who: 15, changed: {x: -1, y: -4}}];
+l[809]=
+[{added: 3073},
+ {who: 3073, changed: {x: 0, y: -5}}];
+l[831]=
+[{added: 3132},
+ {who: 3132, changed: {x: -4, y: -4}}];
+l[902]=
+[{added: 3191},
+ {who: 3191, changed: {x: 1, y: 2}}];
+l[910]=
+[{added: 3250},
+ {who: 3250, changed: {x: 4, y: -4}}];
+l[2129]=
+[{added: 3309},
+ {who: 41, changed: {x: 0, y: 0}},
+ {who: 31, changed: {x: 2, y: 0}},
+ {who: 39, changed: {x: 2, y: 2}},
+ {who: 3309, changed: {x: 1, y: 1}},
+ {who: 4, changed: {x: 1, y: 0}}];
+l[2389]=
+[{added: 3368},
+ {who: 3368, changed: {x: 4, y: -1}},
+ {who: 48, changed: {x: 3, y: 0}},
+ {who: 11, changed: {x: 3, y: -1}},
+ {who: 49, changed: {x: 5, y: -2}}];
+l[2394]=
+[{added: 3427},
+ {who: 3427, changed: {x: -5, y: 2}}];
+l[2842]=
+[{added: 3486},
+ {who: 3486, changed: {x: -2, y: -5}}];
+l[3390]=
+[{added: 3545},
+ {who: 3545, changed: {x: -1, y: -1}},
+ {who: 3309, changed: {x: 0, y: 2}},
+ {who: 7, changed: {x: 1, y: 0}},
+ {who: 4, changed: {x: 1, y: 1}},
+ {who: 3, changed: {x: 1, y: -1}},
+ {who: 47, changed: {x: 0, y: -1}}];
+l[3939]=
+[{added: 3604},
+ {who: 28, changed: {x: -3, y: -1}},
+ {who: 3604, changed: {x: 0, y: -1}},
+ {who: 47, changed: {x: 0, y: 0}},
+ {who: 20, changed: {x: -4, y: 0}},
+ {who: 26, changed: {x: -2, y: 0}},
+ {who: 14, changed: {x: -1, y: 2}},
+ {who: 8, changed: {x: -3, y: -2}},
+ {who: 1, changed: {x: -3, y: 0}},
+ {who: 38, changed: {x: -1, y: -2}},
+ {who: 41, changed: {x: -2, y: 1}},
+ {who: 50, changed: {x: -2, y: -2}},
+ {who: 33, changed: {x: -2, y: -1}}];
+l[4031]=
+[{added: 3663},
+ {who: 3663, changed: {x: -3, y: -4}}];
+l[4102]=
+[{added: 3722},
+ {who: 3722, changed: {x: 3, y: 2}}];
+l[4110]=
+[{added: 3781},
+ {who: 3781, changed: {x: 2, y: -4}}];
+l[5316]=
+[{added: 3840},
+ {who: 3840, changed: {x: -6, y: 1}}];
+l[5329]=
+[{added: 3899},
+ {who: 21, changed: {x: 0, y: -2}},
+ {who: 3899, changed: {x: 2, y: -1}},
+ {who: 41, changed: {x: -2, y: 2}},
+ {who: 10, changed: {x: -1, y: -2}},
+ {who: 43, changed: {x: 3, y: -2}},
+ {who: 22, changed: {x: 2, y: -2}},
+ {who: 38, changed: {x: -2, y: 0}},
+ {who: 26, changed: {x: -2, y: 1}},
+ {who: 33, changed: {x: -1, y: -1}},
+ {who: 3545, changed: {x: 0, y: -1}},
+ {who: 3604, changed: {x: -2, y: -1}},
+ {who: 37, changed: {x: 1, y: -2}}];
+l[5594]=
+[{added: 3958},
+ {who: 3958, changed: {x: -3, y: 2}}];
+l[6042]=
+[{added: 4017},
+ {who: 4017, changed: {x: -1, y: -5}}];
+l[6373]=
+[{added: 4076},
+ {who: 4076, changed: {x: -2, y: 3}}];
+l[6590]=
+[{added: 4135},
+ {who: 47, changed: {x: 0, y: 1}},
+ {who: 4135, changed: {x: 1, y: -2}},
+ {who: 16, changed: {x: -1, y: 1}},
+ {who: 7, changed: {x: 1, y: -1}},
+ {who: 14, changed: {x: -1, y: 3}},
+ {who: 37, changed: {x: 0, y: -1}},
+ {who: 3545, changed: {x: 0, y: 0}},
+ {who: 3, changed: {x: 1, y: 0}},
+ {who: 25, changed: {x: -1, y: 2}}];
+l[7231]=
+[{added: 4194},
+ {who: 4194, changed: {x: -5, y: -4}}];
+l[7302]=
+[{added: 4253},
+ {who: 4253, changed: {x: 3, y: 3}}];
+l[8529]=
+[{added: 4312},
+ {who: 43, changed: {x: 3, y: -3}},
+ {who: 48, changed: {x: 3, y: -1}},
+ {who: 4312, changed: {x: 2, y: -1}},
+ {who: 3899, changed: {x: 3, y: -2}},
+ {who: 11, changed: {x: 3, y: 0}},
+ {who: 12, changed: {x: 3, y: -4}}];
+l[9242]=
+[{added: 4371},
+ {who: 4371, changed: {x: -2, y: -4}}];
+l[9790]=
+[{added: 4430},
+ {who: 19, changed: {x: 0, y: 0}},
+ {who: 4430, changed: {x: 0, y: -2}},
+ {who: 33, changed: {x: 0, y: -1}},
+ {who: 3014, changed: {x: 1, y: -4}},
+ {who: 21, changed: {x: 0, y: -3}},
+ {who: 3545, changed: {x: -1, y: 0}},
+ {who: 37, changed: {x: -1, y: -1}}];
+var minimum_x = -8;
+var maximum_x = 7;
+var minimum_y = -7;
+var maximum_y = 5;
+var default_color = 'rgba(164, 164, 164, 0.71)';
+var default_size = 1;
+</script>
+</head>
+<body>
+<p>
+Here are the results of running the cancer model with these settings:
+<p>
+<p>to be done</p>
+<p>Here is an animation of the model running:</p>
+<div id='canvas'></div>
+<p>Here are some graphs:</p>
+<p>to be done</p>
+</body>
+</html>
+
