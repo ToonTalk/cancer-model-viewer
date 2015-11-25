@@ -9,24 +9,33 @@
 
  	var replicate_states = []; // an array of cell_states for each replicate (run of the model)
 
- 	var last_tick = 0; // the last time when an event happened in any of the replicates
+ 	var canvases = [];         // contains one canvas for each replicate
 
- 	var icon_size = 5; // size when an icon
+ 	var last_tick = 0;         // the last time when an event happened in any of the replicates
 
- 	var expanded_size = 30;
+ 	var icon_size = 5;         // size when an icon
+
+ 	var expanded_size = 30;    // size when running expanded
 
  	var canvas_click_listener = function (event) {
  	    var canvas = event.target;
  	    var new_canvas = document.createElement("canvas");
- 	    var replicate_states_singleton = [replicate_states[canvases.indexOf(event.target)]];
+ 	    var index = canvases.indexOf(event.target);
+ 	    var replicate_states_singleton = [replicate_states[index]];
  	    var canvases_singleton = [new_canvas];
  	    var remove_canvas = function () {
- 	        document.getElementById('canvas').removeChild(new_canvas);
+ 	        document.getElementById('canvases').removeChild(canvas_and_caption_div);
  	    }
- 	    document.getElementById('canvas').appendChild(new_canvas);
+ 	    var time_monitor_id = "time-monitor-of-" + index;
+ 	    var canvas_and_caption_div = document.createElement('div');
+ 	    var caption = document.createElement('p');
+ 	    caption.innerHTML = "Animation of replicate #" + (index+1) + " at time <span id='" + time_monitor_id + "'>0</span>. Click to remove it.";
+ 	    canvas_and_caption_div.appendChild(new_canvas);
+ 	    canvas_and_caption_div.appendChild(caption);
+ 	    document.getElementById('canvases').appendChild(canvas_and_caption_div);
  	    new_canvas.addEventListener('click', remove_canvas);
  	    // animate this single replicate at a larger size
- 	    animate_cells(replicate_states_singleton, canvases_singleton, expanded_size, 20, false, 20);
+ 	    animate_cells(replicate_states_singleton, canvases_singleton, expanded_size, 20, false, 20, time_monitor_id);
  	};
 
  	var initialize = function () {
@@ -35,6 +44,7 @@
         	document.write("Simulation is not finished. Please refresh this page later.");
         	return;
         }
+        write_page();
         display_cell = running_3D ? display_cell_3D : display_cell_2D;
         clear_all    = running_3D ? clear_all_3D    : clear_all_2D;
         replicates.forEach(function (replicate) {
@@ -67,11 +77,11 @@
             replicate_states.push(cell_states);
             canvas = document.createElement("canvas");
             canvas.addEventListener('click', canvas_click_listener);
-            document.getElementById('canvas').appendChild(canvas);
+            document.getElementById('canvases').appendChild(canvas);
             canvases.push(canvas);
         });
         // run with animation time proportional to simulation time (if computer is fast enough)
-        animate_cells(replicate_states, canvases, icon_size, 20, false, 20);
+        animate_cells(replicate_states, canvases, icon_size, 20, false, 20, 'canvases-time');
         // display changed frames every 100 milliseconds -- only works for a single canvas
 //         animate_cells(replicates, canvases, 20, 100, true); 
  	};
@@ -94,9 +104,12 @@
  	    }); 
  	};
 
- 	var animate_cells = function (replicate_states, canvases, scale, frame_duration, skip_unchanging_frames, skip_every_n_frames, callback) {
+ 	var animate_cells = function (replicate_states, canvases, scale, frame_duration, skip_unchanging_frames, skip_every_n_frames, time_monitor_id, callback) {
         var tick = 1;
         var display_frame = function () {
+            if (document.getElementById(time_monitor_id)) {
+                document.getElementById(time_monitor_id).textContent = tick.toString();
+            }
             replicate_states.forEach(function (cell_states, index) {
                 var cells = cell_states[tick];
                 var canvas = canvases[index];
@@ -139,7 +152,15 @@
         display_frame();
  	};
 
- 	var canvases = [];  // one canvas for each replicate
+ 	var write_page = function () {
+ 	    document.write("<p>Results from running the cancer model with these settings:</p>");
+ 	    document.write("<p><i>to be done</i></p>");
+ 	    document.write("<p>Here is an animation of the model running " + replicates.length + " times. Time is " + "<span id='canvases-time'>0</span>. To inspect a replicate click on it.</p>");
+        document.write("<div id='canvases'></div>");
+        document.write("<p>Here are some graphs:</p>");
+        document.write("<p><i>to be done</i></p>");
+ 	};
+
  	var context_2D,     // used to draw upon the 2D canvas
  	    display_cell,   // function to display a cell
  	    clear_all;      // function to clear all displays
