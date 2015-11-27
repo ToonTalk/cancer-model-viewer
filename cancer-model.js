@@ -35,7 +35,7 @@
  	    document.getElementById('canvases').appendChild(canvas_and_caption_div);
  	    new_canvas.addEventListener('click', remove_canvas);
  	    // animate this single replicate at a larger size
- 	    animate_cells(replicate_states_singleton, canvases_singleton, expanded_size, 20, false, 20, time_monitor_id);
+ 	    animate_cells(replicate_states_singleton, canvases_singleton, expanded_size, 20, false, 2, time_monitor_id);
  	};
 
  	var initialize = function () {
@@ -60,7 +60,7 @@
                              cell_numbers.push(event.added);
                          } else if (event.removed) {
                              index = cell_numbers.indexOf(event.removed);
-                             cell_numbers = cell_numbers.splice(index, 1);
+                             cell_numbers.splice(index, 1);
                          } else if (event.changed) {
                              event.changed.who = event.who;
                              current_cell_states[event.who] = event.changed;
@@ -155,7 +155,7 @@
  	var write_page = function () {
  	    document.write("<p>Results from running the cancer model with these settings:</p>");
  	    document.write("<p><i>to be done</i></p>");
- 	    document.write("<p>Here is an animation of the model running " + replicates.length + " times. Time is " + "<span id='canvases-time'>0</span>. To inspect a replicate click on it.</p>");
+ 	    document.write("<p>Here is an animation of the model replicated " + replicates.length + " times. Cuurent time is " + "<span id='canvases-time'>0</span>. To inspect a replicate click on it.</p>");
         document.write("<div id='canvases'></div>");
         document.write("<p>Here are some graphs:</p>");
         document.write("<p><i>to be done</i></p>");
