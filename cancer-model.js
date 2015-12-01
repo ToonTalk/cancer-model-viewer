@@ -234,8 +234,14 @@
                 }
                 cells.forEach(function (cell) {
                      var radius = (cell.s || default_size)/2;
-                     var color =   cell.c || default_color;
-                     display_cell(cell, scale, radius, color);
+                     var color;
+                     if (typeof default_colors !== "undefined") {
+                         color = default_colors[cell.c || 0];
+                     } else {
+                         // backwards compatibility with old log files
+                         color = cell.c || default_color
+                     }
+                     color = display_cell(cell, scale, radius, color);
                 });
             });
             tick++;
