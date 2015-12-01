@@ -64,7 +64,7 @@
  	};
 
  	var initialize = function () {
- 	   	var tick, events;
+ 	   	var tick, events, sums, sum_of_square_of_difference;
         if (typeof l === 'undefined') { // the log has the short name 'l' to keep down bandwidth and file sizes
         	document.write("Simulation is not finished. Please refresh this page later.");
         	return;
@@ -85,7 +85,6 @@
  	   	    var current_growth_arrest = 0;
  	   	    var current_proliferation = 0;
  	   	    var current_necrosis      = 0;
- 	   	    var sum_of_square_of_difference = 0;
  	   	    var statistics;
             for (tick = 1; tick < replicate.l.length; tick++) {
                 events     = replicate.l[tick];
@@ -144,7 +143,7 @@
         proliferation_mean[1] = 0;
         necrosis_mean[1]      = 0;
         for (tick = 1; tick < last_tick; tick++) {
-            var sums = [];
+            sums = [];
             replicate_apoptosis_values.forEach(function (replicate_values) { 
                 sums[tick] = (sums[tick] || 0)+replicate_values[tick];
             });
@@ -165,6 +164,28 @@
             });
             necrosis_mean[tick] = sums[tick]/replicates.length;
         };
+        for (tick = 1; tick < last_tick; tick++) {
+            sum_of_square_of_difference = [];
+            replicate_apoptosis_values.forEach(function (replicate_values, index) { 
+                sum_of_square_of_difference[tick] = (sum_of_square_of_difference[tick] || 0)+Math.pow(replicate_values[tick]-apoptosis_mean[tick], 2);
+            });
+            apoptosis_standard_deviation[tick] = Math.sqrt(sum_of_square_of_difference[tick]/replicates.length);
+            sum_of_square_of_difference = [];
+            replicate_growth_arrest_values.forEach(function (replicate_values, index) { 
+                sum_of_square_of_difference[tick] = (sum_of_square_of_difference[tick] || 0)+Math.pow(replicate_values[tick]-growth_arrest_mean[tick], 2);
+            });
+            growth_arrest_standard_deviation[tick] = Math.sqrt(sum_of_square_of_difference[tick]/replicates.length);
+            sum_of_square_of_difference = [];
+            replicate_proliferation_values.forEach(function (replicate_values, index) { 
+                sum_of_square_of_difference[tick] = (sum_of_square_of_difference[tick] || 0)+Math.pow(replicate_values[tick]-proliferation_mean[tick], 2);
+            });
+            proliferation_standard_deviation[tick] = Math.sqrt(sum_of_square_of_difference[tick]/replicates.length);
+            sum_of_square_of_difference = [];
+            replicate_necrosis_values.forEach(function (replicate_values, index) { 
+                sum_of_square_of_difference[tick] = (sum_of_square_of_difference[tick] || 0)+Math.pow(replicate_values[tick]-necrosis_mean[tick], 2);
+            });
+            necrosis_standard_deviation[tick] = Math.sqrt(sum_of_square_of_difference[tick]/replicates.length);
+        }
         // run with animation time proportional to simulation time (if computer is fast enough)
         animate_cells(replicate_states, canvases, icon_size, 20, false, 20, 'canvases-time');
         // display changed frames every 100 milliseconds -- only works for a single canvas
