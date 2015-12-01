@@ -133,7 +133,7 @@
             replicate_apoptosis_values    .push(apoptosis_values);
             replicate_growth_arrest_values.push(growth_arrest_values);
             replicate_proliferation_values.push(proliferation_values);
-            replicate_anecrosis_values    .push(necrosis_values);
+            replicate_necrosis_values     .push(necrosis_values);
             canvas = document.createElement("canvas");
             canvas.addEventListener('click', canvas_click_listener);
             document.getElementById('canvases').appendChild(canvas);
@@ -145,18 +145,26 @@
         necrosis_mean[1]      = 0;
         for (tick = 1; tick < last_tick; tick++) {
             var sums = [];
-            sums[1] = 0;
             replicate_apoptosis_values.forEach(function (replicate_values) { 
-                sums[tick] += replicate_values[tick];
+                sums[tick] = (sums[tick] || 0)+replicate_values[tick];
             });
             apoptosis_mean[tick] = sums[tick]/replicates.length;
+            sums = [];
+            replicate_growth_arrest_values.forEach(function (replicate_values) { 
+                sums[tick] = (sums[tick] || 0)+replicate_values[tick];
+            });
+            growth_arrest_mean[tick] = sums[tick]/replicates.length;
+            sums = [];
+            replicate_proliferation_values.forEach(function (replicate_values) { 
+                sums[tick] = (sums[tick] || 0)+replicate_values[tick];
+            });
+            proliferation_mean[tick] = sums[tick]/replicates.length;
+            sums = [];
+            replicate_necrosis_values.forEach(function (replicate_values) { 
+                sums[tick] = (sums[tick] || 0)+replicate_values[tick];
+            });
+            necrosis_mean[tick] = sums[tick]/replicates.length;
         };
-//         for (tick = 1; tick < last_tick; tick++) {
-//             apoptosis_mean[tick]      += apoptosis_values[tick]/replicates.length;
-//             growth_arrest_mean[tick]  += growth_arrest_values[tick]/replicates.length;
-//             proliferation_mean [tick] += proliferation_values[tick]/replicates.length;
-//             necrosis_mean[tick]       += necrosis_values[tick]/replicates.length;
-//         }
         // run with animation time proportional to simulation time (if computer is fast enough)
         animate_cells(replicate_states, canvases, icon_size, 20, false, 20, 'canvases-time');
         // display changed frames every 100 milliseconds -- only works for a single canvas
