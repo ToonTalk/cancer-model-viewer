@@ -98,8 +98,11 @@
                              index = cell_numbers.indexOf(event.removed);
                              cell_numbers.splice(index, 1);
                          } else if (event.changed) {
+                             // for backwards compatibility for sample outputs -- remove when they are recreated
                              event.changed.who = event.who;
                              current_cell_states[event.who] = event.changed;
+                         } else if (event.who) {
+                             current_cell_states[event.who] = event;
                          }
                     });
                 }
