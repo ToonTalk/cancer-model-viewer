@@ -148,22 +148,30 @@
         for (tick = 1; tick < last_tick; tick++) {
             sums = [];
             replicate_apoptosis_values.forEach(function (replicate_values) { 
-                sums[tick] = (sums[tick] || 0)+replicate_values[tick];
+                if (replicate_values[tick]) {
+                    sums[tick] = (sums[tick] || 0)+replicate_values[tick];
+                }
             });
             apoptosis_mean[tick] = sums[tick]/replicates.length;
             sums = [];
-            replicate_growth_arrest_values.forEach(function (replicate_values) { 
-                sums[tick] = (sums[tick] || 0)+replicate_values[tick];
+            replicate_growth_arrest_values.forEach(function (replicate_values) {
+                if (replicate_values[tick]) {
+                   sums[tick] = (sums[tick] || 0)+replicate_values[tick];
+                }
             });
             growth_arrest_mean[tick] = sums[tick]/replicates.length;
             sums = [];
             replicate_proliferation_values.forEach(function (replicate_values) { 
-                sums[tick] = (sums[tick] || 0)+replicate_values[tick];
+                if (replicate_values[tick]) {
+                    sums[tick] = (sums[tick] || 0)+replicate_values[tick];
+                }
             });
             proliferation_mean[tick] = sums[tick]/replicates.length;
             sums = [];
-            replicate_necrosis_values.forEach(function (replicate_values) { 
-                sums[tick] = (sums[tick] || 0)+replicate_values[tick];
+            replicate_necrosis_values.forEach(function (replicate_values) {
+                if (replicate_values[tick]) { 
+                  sums[tick] = (sums[tick] || 0)+replicate_values[tick];
+                }
             });
             necrosis_mean[tick] = sums[tick]/replicates.length;
         };
@@ -188,6 +196,23 @@
                 sum_of_square_of_difference[tick] = (sum_of_square_of_difference[tick] || 0)+Math.pow(replicate_values[tick]-necrosis_mean[tick], 2);
             });
             necrosis_standard_deviation[tick] = Math.sqrt(sum_of_square_of_difference[tick]/replicates.length);
+        }
+        if (proliferation_mean[proliferation_mean.length-1]) {
+            // not all zeros
+            display_mean("mean-proliferation", "Proliferation", proliferation_mean, proliferation_standard_deviation);
+            display_all( "all-proliferation",  "Proliferation", replicate_proliferation_values, proliferation_mean, proliferation_standard_deviation);
+        }
+        if (apoptosis_mean[apoptosis_mean.length-1]) {
+            display_mean("mean-apoptosis", "Apoptosis", apoptosis_mean, apoptosis_standard_deviation);
+            display_all( "all-apoptosis",  "Apoptosis", replicate_apoptosis_values, apoptosis_mean, apoptosis_standard_deviation);
+        }
+        if (growth_arrest_mean[growth_arrest_mean.length-1]) {
+            display_mean("mean-growth_arrestn", "Growth arrest", growth_arrest_mean, growth_arrest_standard_deviation);
+            display_all( "all-growth_arrestn",  "Growth arrest", replicate_growth_arrest_values, growth_arrest_mean, growth_arrest_standard_deviation);
+        }
+        if (necrosis_mean[necrosis_mean.length-1]) {
+            display_mean("mean-necrosis", "Necrosis", necrosis_mean, necrosis_standard_deviation);
+            display_all( "all-necrosis",  "Necrosis", replicate_necrosis_values, necrosis_mean, necrosis_standard_deviation);
         }
         // run with animation time proportional to simulation time (if computer is fast enough)
         animate_cells(replicate_states, canvases, icon_size, 20, false, 20, 'canvases-time');
@@ -273,7 +298,22 @@
  	    document.write("<p>Here is an animation of the model replicated " + replicates.length + " times. Cuurent time is " + "<span id='canvases-time'>0</span>. To inspect a replicate click on it.</p>");
         document.write("<div id='canvases'></div>");
         document.write("<p>Here are some graphs:</p>");
-        document.write("<p><i>to be done</i></p>");
+        document.write("<div id='mean-proliferation'></div>");
+        document.write("<div id='mean-apoptosis'></div>");
+        document.write("<div id='mean-growth_arrest'></div>");
+        document.write("<div id='mean-necrosis'></div>");
+        document.write("<div id='all-proliferation'></div>");
+        document.write("<div id='all-apoptosis'></div>");
+        document.write("<div id='all-growth_arrest'></div>");
+        document.write("<div id='all-necrosis'></div>");
+ 	};
+
+ 	var display_mean = function(id, label, mean_values, standard_deviation_values) {
+ 	    // to do
+ 	};
+
+ 	var display_all = function(id, label, all_values, mean_values, standard_deviation_values) {
+ 	    // all_values is an array of arrays
  	};
 
  	var context_2D,     // used to draw upon the 2D canvas
