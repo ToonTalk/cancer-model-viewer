@@ -302,11 +302,12 @@
         addParagraph("<i>to be done</i>");
         addParagraph("Here is an animation of the model replicated " + replicates.length + " times. Current time is " + "<span id='canvases-time'>0</span>. To inspect a replicate click on it.");
         addDiv('canvases');
-        addParagraph("Here are some graphs:");
+        addParagraph("Averaged simulation data:");
         addDiv('mean-proliferation');
         addDiv('mean-apoptosis');
         addDiv('mean-growth_arrest');
         addDiv('mean-necrosis');
+        addParagraph("All simulation data:");
         addDiv('all-proliferation');
         addDiv('all-apoptosis');
         addDiv('all-growth_arrest');
@@ -314,22 +315,44 @@
     };
 
     var display_mean = function(id, label, mean_values, standard_deviation_values) {
-        var trace1 = {
-          x: [1, 2, 3, 4], 
-          y: [10, 15, 13, 17], 
-          type: 'scatter'
+
+        var data = [
+        {
+            y: mean_values,
+            error_y: {
+                type: 'data',
+                array: standard_deviation_values,
+                visible: true,
+                traceref:1,
+                width:0,
+                color:"rgba(31, 119, 180, 0.34)",
+                thickness:1
+                },
+                type: 'scatter',
+                mode: 'lines',
+                line: {shape: 'spline'}
+        }];
+
+        var layout = {
+            title: "Mean cell " + label.toLowerCase() + " rate averaged over 500 simulations"
         };
-        var trace2 = {
-          x: [1, 2, 3, 4], 
-          y: [16, 5, 11, 9], 
-          type: 'scatter'
-        };
-        var data = [trace1, trace2];
-        Plotly.newPlot('mean-proliferation', data);
+
+        Plotly.newPlot(id, data, layout);
     };
 
     var display_all = function(id, label, all_values, mean_values, standard_deviation_values) {
         // all_values is an array of arrays
+        var data = [
+        {
+            y: all_values,
+            type: 'scatter',
+        }];
+
+        var layout = {
+            title: "Cell " + label.toLowerCase() + " rate for all 500 simulations"
+        };
+
+        Plotly.newPlot(id, data, layout);
     };
 
     var context_2D,     // used to draw upon the 2D canvas
