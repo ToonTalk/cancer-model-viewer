@@ -295,7 +295,7 @@
  	var write_page = function () {
  	    document.write("<p>Results from running the cancer model with these settings:</p>");
  	    document.write("<p><i>to be done</i></p>");
- 	    document.write("<p>Here is an animation of the model replicated " + replicates.length + " times. Cuurent time is " + "<span id='canvases-time'>0</span>. To inspect a replicate click on it.</p>");
+ 	    document.write("<p>Here is an animation of the model replicated " + replicates.length + " times. Current time is " + "<span id='canvases-time'>0</span>. To inspect a replicate click on it.</p>");
         document.write("<div id='canvases'></div>");
         document.write("<p>Here are some graphs:</p>");
         document.write("<div id='mean-proliferation'></div>");
@@ -309,7 +309,18 @@
  	};
 
  	var display_mean = function(id, label, mean_values, standard_deviation_values) {
- 	    // to do
+ 	    var trace1 = {
+ 	      x: [1, 2, 3, 4], 
+          y: [10, 15, 13, 17], 
+          type: 'scatter'
+        };
+        var trace2 = {
+          x: [1, 2, 3, 4], 
+          y: [16, 5, 11, 9], 
+          type: 'scatter'
+        };
+        var data = [trace1, trace2];
+        Plotly.newPlot('mean-proliferation', data);
  	};
 
  	var display_all = function(id, label, all_values, mean_values, standard_deviation_values) {
