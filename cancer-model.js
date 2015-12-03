@@ -293,19 +293,29 @@
  	};
 
  	var write_page = function () {
- 	    document.write("<p>Results from running the cancer model with these settings:</p>");
- 	    document.write("<p><i>to be done</i></p>");
- 	    document.write("<p>Here is an animation of the model replicated " + replicates.length + " times. Current time is " + "<span id='canvases-time'>0</span>. To inspect a replicate click on it.</p>");
-        document.write("<div id='canvases'></div>");
-        document.write("<p>Here are some graphs:</p>");
-        document.write("<div id='mean-proliferation'></div>");
-        document.write("<div id='mean-apoptosis'></div>");
-        document.write("<div id='mean-growth_arrest'></div>");
-        document.write("<div id='mean-necrosis'></div>");
-        document.write("<div id='all-proliferation'></div>");
-        document.write("<div id='all-apoptosis'></div>");
-        document.write("<div id='all-growth_arrest'></div>");
-        document.write("<div id='all-necrosis'></div>");
+ 	   	    var addParagraph = function (html) {
+ 	        var p = document.createElement('p');
+ 	        p.innerHTML = html;
+ 	        document.body.appendChild(p);
+ 	    };
+ 	    var addDiv = function (id) {
+ 	        var div = document.createElement('div');
+ 	        div.id = id;
+ 	        document.body.appendChild(div);
+ 	    };
+ 	    addParagraph("Results from running the cancer model with these settings:");
+ 	    addParagraph("<i>to be done</i>");
+ 	    addParagraph("Here is an animation of the model replicated " + replicates.length + " times. Current time is " + "<span id='canvases-time'>0</span>. To inspect a replicate click on it.");
+        addDiv('canvases');
+        addParagraph("Here are some graphs:");
+        addDiv('mean-proliferation');
+        addDiv('mean-apoptosis');
+        addDiv('mean-growth_arrest');
+        addDiv('mean-necrosis');
+        addDiv('all-proliferation');
+        addDiv('all-apoptosis');
+        addDiv('all-growth_arrest');
+        addDiv('all-necrosis');
  	};
 
  	var display_mean = function(id, label, mean_values, standard_deviation_values) {
