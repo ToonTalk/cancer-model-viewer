@@ -9,13 +9,13 @@
 
  	var replicate_states = [];                      // an array of cell_states for each replicate (run of the model) - index is tick number
 
- 	var replicate_apoptosis_values = [];                      // an array an array of the cummulative number of apoptosis events for each replicate - index is tick number
+ 	var replicate_apoptosis_values = [];            // an array an array of the cummulative number of apoptosis events for each replicate - index is tick number
 
- 	var replicate_growth_arrest_values = [];                  // an array an array of the cummulative number of growth_arrest events for each replicate - index is tick number
+ 	var replicate_growth_arrest_values = [];        // an array an array of the cummulative number of growth_arrest events for each replicate - index is tick number
 
- 	var replicate_proliferation_values = [];                  // an array an array of the cummulative number of proliferation events for each replicate - index is tick number
+ 	var replicate_proliferation_values = [];        // an array an array of the cummulative number of proliferation events for each replicate - index is tick number
 
- 	var replicate_necrosis_values = [];                       // an array an array of the cummulative number of necrosis events for each replicate - index is tick number
+ 	var replicate_necrosis_values = [];             // an array an array of the cummulative number of necrosis events for each replicate - index is tick number
 
  	var apoptosis_mean = [];                        // the mean apoptosis values at each tick
 
@@ -73,13 +73,13 @@
         display_cell = running_3D ? display_cell_3D : display_cell_2D;
         clear_all    = running_3D ? clear_all_3D    : clear_all_2D;
         replicates.forEach(function (replicate) {
-            var cell_numbers = [];        // ids of cells currently alive
- 	   	    var current_cell_states = []; // the graphical state of each current cell
- 	   	    var cell_states = [];         // index is the tick number and the contents are the visual states of cells current at that time
- 	   	    var apoptosis_values = [];                      // an array of the cummulative number of apoptosis events for this replicate - index is tick number
-            var growth_arrest_values = [];                  // an array of the cummulative number of growth_arrest events for this replicate - index is tick number
-            var proliferation_values = [];                  // an array of the cummulative number of proliferation events for this replicate - index is tick number
-            var necrosis_values = [];                       // an array of the cummulative number of necrosis events for this replicate - index is tick number
+            var cell_numbers = [];                // ids of cells currently alive
+ 	   	    var current_cell_states = [];         // the graphical state of each current cell
+ 	   	    var cell_states = [];                 // index is the tick number and the contents are the visual states of cells current at that time
+ 	   	    var apoptosis_values = [];            // an array of the cummulative number of apoptosis events for this replicate - index is tick number
+            var growth_arrest_values = [];        // an array of the cummulative number of growth_arrest events for this replicate - index is tick number
+            var proliferation_values = [];        // an array of the cummulative number of proliferation events for this replicate - index is tick number
+            var necrosis_values = [];             // an array of the cummulative number of necrosis events for this replicate - index is tick number
             var necrosis_standard_deviation = [];
  	   	    var current_apoptosis     = 0;
  	   	    var current_growth_arrest = 0;
@@ -138,38 +138,34 @@
             replicate_necrosis_values     .push(necrosis_values);
             canvas = document.createElement("canvas");
             canvas.addEventListener('click', canvas_click_listener);
-            document.getElementById('canvases').appendChild(canvas);
+//             document.getElementById('canvases').appendChild(canvas);
             canvases.push(canvas);
         });
-//         apoptosis_mean[1]     = 0;
-        growth_arrest_mean[1] = 0;
-        proliferation_mean[1] = 0;
-        necrosis_mean[1]      = 0;
         for (tick = 1; tick < last_tick; tick++) {
             sums = [];
             replicate_apoptosis_values.forEach(function (replicate_values) { 
-                if (replicate_values[tick]) {
+                if (replicate_values[tick] !== undefined) {
                     sums[tick] = (sums[tick] || 0)+replicate_values[tick];
                 }
             });
             apoptosis_mean[tick] = sums[tick]/replicates.length;
             sums = [];
             replicate_growth_arrest_values.forEach(function (replicate_values) {
-                if (replicate_values[tick]) {
+                if (replicate_values[tick] !== undefined) {
                    sums[tick] = (sums[tick] || 0)+replicate_values[tick];
                 }
             });
             growth_arrest_mean[tick] = sums[tick]/replicates.length;
             sums = [];
             replicate_proliferation_values.forEach(function (replicate_values) { 
-                if (replicate_values[tick]) {
+                if (replicate_values[tick] !== undefined) {
                     sums[tick] = (sums[tick] || 0)+replicate_values[tick];
                 }
             });
             proliferation_mean[tick] = sums[tick]/replicates.length;
             sums = [];
             replicate_necrosis_values.forEach(function (replicate_values) {
-                if (replicate_values[tick]) { 
+                if (replicate_values[tick] !== undefined) { 
                   sums[tick] = (sums[tick] || 0)+replicate_values[tick];
                 }
             });
@@ -202,18 +198,18 @@
             display_mean("mean-proliferation", "Proliferation", proliferation_mean, proliferation_standard_deviation);
             display_all( "all-proliferation",  "Proliferation", replicate_proliferation_values, proliferation_mean, proliferation_standard_deviation);
         }
-        if (apoptosis_mean[apoptosis_mean.length-1]) {
-            display_mean("mean-apoptosis", "Apoptosis", apoptosis_mean, apoptosis_standard_deviation);
-            display_all( "all-apoptosis",  "Apoptosis", replicate_apoptosis_values, apoptosis_mean, apoptosis_standard_deviation);
-        }
-        if (growth_arrest_mean[growth_arrest_mean.length-1]) {
-            display_mean("mean-growth_arrestn", "Growth arrest", growth_arrest_mean, growth_arrest_standard_deviation);
-            display_all( "all-growth_arrestn",  "Growth arrest", replicate_growth_arrest_values, growth_arrest_mean, growth_arrest_standard_deviation);
-        }
-        if (necrosis_mean[necrosis_mean.length-1]) {
-            display_mean("mean-necrosis", "Necrosis", necrosis_mean, necrosis_standard_deviation);
-            display_all( "all-necrosis",  "Necrosis", replicate_necrosis_values, necrosis_mean, necrosis_standard_deviation);
-        }
+//         if (apoptosis_mean[apoptosis_mean.length-1]) {
+//             display_mean("mean-apoptosis", "Apoptosis", apoptosis_mean, apoptosis_standard_deviation);
+//             display_all( "all-apoptosis",  "Apoptosis", replicate_apoptosis_values, apoptosis_mean, apoptosis_standard_deviation);
+//         }
+//         if (growth_arrest_mean[growth_arrest_mean.length-1]) {
+//             display_mean("mean-growth_arrestn", "Growth arrest", growth_arrest_mean, growth_arrest_standard_deviation);
+//             display_all( "all-growth_arrestn",  "Growth arrest", replicate_growth_arrest_values, growth_arrest_mean, growth_arrest_standard_deviation);
+//         }
+//         if (necrosis_mean[necrosis_mean.length-1]) {
+//             display_mean("mean-necrosis", "Necrosis", necrosis_mean, necrosis_standard_deviation);
+//             display_all( "all-necrosis",  "Necrosis", replicate_necrosis_values, necrosis_mean, necrosis_standard_deviation);
+//         }
         // run with animation time proportional to simulation time (if computer is fast enough)
         animate_cells(replicate_states, canvases, icon_size, 20, false, 20, 'canvases-time');
         // display changed frames every 100 milliseconds -- only works for a single canvas
@@ -293,19 +289,50 @@
  	};
 
  	var write_page = function () {
- 	    document.write("<p>Results from running the cancer model with these settings:</p>");
- 	    document.write("<p><i>to be done</i></p>");
- 	    document.write("<p>Here is an animation of the model replicated " + replicates.length + " times. Current time is " + "<span id='canvases-time'>0</span>. To inspect a replicate click on it.</p>");
-        document.write("<div id='canvases'></div>");
-        document.write("<p>Here are some graphs:</p>");
-        document.write("<div id='mean-proliferation'></div>");
-        document.write("<div id='mean-apoptosis'></div>");
-        document.write("<div id='mean-growth_arrest'></div>");
-        document.write("<div id='mean-necrosis'></div>");
-        document.write("<div id='all-proliferation'></div>");
-        document.write("<div id='all-apoptosis'></div>");
-        document.write("<div id='all-growth_arrest'></div>");
-        document.write("<div id='all-necrosis'></div>");
+<<<<<<< .merge_file_I7Bk5k
+//  	    document.write("<p>Results from running the cancer model with these settings:</p>");
+//  	    document.write("<p><i>to be done</i></p>");
+//  	    document.write("<p>Here is an animation of the model replicated " + replicates.length + " times. Current time is " + "<span id='canvases-time'>0</span>. To inspect a replicate click on it.</p>");
+//         document.write("<div id='canvases'></div>");
+//         document.write("<p>Here are some graphs:</p>");
+//         document.write("<div id='mean-proliferation'></div>");
+        var div = document.createElement('div');
+        div.id = 'mean-proliferation';
+        document.body.appendChild(div);
+//         document.write("<p>After mean proliferation plot</p>");
+//         document.write("<div id='mean-apoptosis'></div>");
+//         document.write("<p>After mean apoptosis plot</p>");
+//         document.write("<div id='mean-growth_arrest'></div>");
+//         document.write("<div id='mean-necrosis'></div>");
+//         document.write("<div id='all-proliferation'></div>");
+//         document.write("<div id='all-apoptosis'></div>");
+//         document.write("<div id='all-growth_arrest'></div>");
+//         document.write("<div id='all-necrosis'></div>");
+=======
+ 	   	    var addParagraph = function (html) {
+ 	        var p = document.createElement('p');
+ 	        p.innerHTML = html;
+ 	        document.body.appendChild(p);
+ 	    };
+ 	    var addDiv = function (id) {
+ 	        var div = document.createElement('div');
+ 	        div.id = id;
+ 	        document.body.appendChild(div);
+ 	    };
+ 	    addParagraph("Results from running the cancer model with these settings:");
+ 	    addParagraph("<i>to be done</i>");
+ 	    addParagraph("Here is an animation of the model replicated " + replicates.length + " times. Current time is " + "<span id='canvases-time'>0</span>. To inspect a replicate click on it.");
+        addDiv('canvases');
+        addParagraph("Here are some graphs:");
+        addDiv('mean-proliferation');
+        addDiv('mean-apoptosis');
+        addDiv('mean-growth_arrest');
+        addDiv('mean-necrosis');
+        addDiv('all-proliferation');
+        addDiv('all-apoptosis');
+        addDiv('all-growth_arrest');
+        addDiv('all-necrosis');
+>>>>>>> .merge_file_SmGwmw
  	};
 
  	var display_mean = function(id, label, mean_values, standard_deviation_values) {
@@ -319,8 +346,17 @@
           y: [16, 5, 11, 9], 
           type: 'scatter'
         };
+
+        var layout = {
+          title: 'Overlaid Chart Without Boundary Lines',
+          width: 400
+        };
+
         var data = [trace1, trace2];
-        Plotly.newPlot('mean-proliferation', data);
+
+//         setTimeout(function(){
+          Plotly.plot('mean-proliferation', data, layout, {showLink: false});
+//         },1000);
  	};
 
  	var display_all = function(id, label, all_values, mean_values, standard_deviation_values) {
