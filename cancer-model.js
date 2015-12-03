@@ -64,7 +64,22 @@
     };
 
     var initialize = function () {
-        var tick, events, sums, sum_of_square_of_difference;
+        var standard_deviation = function (tick, values, mean) {
+            var sum_of_square_of_difference = [];
+            var sample_count = 0;
+            values.forEach(function (replicate_values, index) { 
+                if (replicate_values[tick] !== undefined) { 
+                    sum_of_square_of_difference[tick] = (sum_of_square_of_difference[tick] || 0)+Math.pow(replicate_values[tick]-mean[tick], 2);
+                    sample_count++;
+                }
+            });
+            if (sample_count > 1) {
+                // https://en.wikipedia.org/wiki/Standard_deviation#Corrected_sample_standard_deviation explains why -1 below
+                return Math.sqrt(sum_of_square_of_difference[tick]/(sample_count-1));
+            } 
+            return 0;
+        };
+        var tick, events, sums;
         if (typeof l === 'undefined') { // the log has the short name 'l' to keep down bandwidth and file sizes
             document.write("Simulation is not finished. Please refresh this page later.");
             return;
@@ -166,32 +181,16 @@
             sums = [];
             replicate_necrosis_values.forEach(function (replicate_values) {
                 if (replicate_values[tick] !== undefined) { 
-                  sums[tick] = (sums[tick] || 0)+replicate_values[tick];
+                    sums[tick] = (sums[tick] || 0)+replicate_values[tick];
                 }
             });
             necrosis_mean[tick] = sums[tick]/replicates.length;
         };
         for (tick = 1; tick < last_tick; tick++) {
-            sum_of_square_of_difference = [];
-            replicate_apoptosis_values.forEach(function (replicate_values, index) { 
-                sum_of_square_of_difference[tick] = (sum_of_square_of_difference[tick] || 0)+Math.pow(replicate_values[tick]-apoptosis_mean[tick], 2);
-            });
-            apoptosis_standard_deviation[tick] = Math.sqrt(sum_of_square_of_difference[tick]/replicates.length);
-            sum_of_square_of_difference = [];
-            replicate_growth_arrest_values.forEach(function (replicate_values, index) { 
-                sum_of_square_of_difference[tick] = (sum_of_square_of_difference[tick] || 0)+Math.pow(replicate_values[tick]-growth_arrest_mean[tick], 2);
-            });
-            growth_arrest_standard_deviation[tick] = Math.sqrt(sum_of_square_of_difference[tick]/replicates.length);
-            sum_of_square_of_difference = [];
-            replicate_proliferation_values.forEach(function (replicate_values, index) { 
-                sum_of_square_of_difference[tick] = (sum_of_square_of_difference[tick] || 0)+Math.pow(replicate_values[tick]-proliferation_mean[tick], 2);
-            });
-            proliferation_standard_deviation[tick] = Math.sqrt(sum_of_square_of_difference[tick]/replicates.length);
-            sum_of_square_of_difference = [];
-            replicate_necrosis_values.forEach(function (replicate_values, index) { 
-                sum_of_square_of_difference[tick] = (sum_of_square_of_difference[tick] || 0)+Math.pow(replicate_values[tick]-necrosis_mean[tick], 2);
-            });
-            necrosis_standard_deviation[tick] = Math.sqrt(sum_of_square_of_difference[tick]/replicates.length);
+            apoptosis_standard_deviation[tick]      = standard_deviation(tick, replicate_apoptosis_values, apoptosis_mean);
+            growth_arrest_standard_deviation[tick]  = standard_deviation(tick, replicate_growth_arrest_values, growth_arrest_mean);
+            proliferation_standard_deviation[tick]  = standard_deviation(tick, replicate_proliferation_values, proliferation_mean);
+            necrosis_standard_deviation[tick]       = standard_deviation(tick, replicate_necrosis_values, necrosis_mean);
         }
         if (proliferation_mean[proliferation_mean.length-1]) {
             // not all zeros
