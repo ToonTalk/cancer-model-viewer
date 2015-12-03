@@ -64,6 +64,20 @@
     };
 
     var initialize = function () {
+        var mean = function (tick, values) {
+            var sums = [];
+            var sample_count = 0;
+            values.forEach(function (replicate_values) { 
+                if (replicate_values[tick] !== undefined) {
+                    sums[tick] = (sums[tick] || 0)+replicate_values[tick];
+                    sample_count++;
+                }
+            });
+            if (sample_count > 0) {
+                return sums[tick]/sample_count;
+            } 
+            return 0;
+        };
         var standard_deviation = function (tick, values, mean) {
             var sum_of_square_of_difference = [];
             var sample_count = 0;
@@ -79,7 +93,7 @@
             } 
             return 0;
         };
-        var tick, events, sums;
+        var tick, events;
         if (typeof l === 'undefined') { // the log has the short name 'l' to keep down bandwidth and file sizes
             document.write("Simulation is not finished. Please refresh this page later.");
             return;
@@ -157,36 +171,10 @@
             canvases.push(canvas);
         });
         for (tick = 1; tick < last_tick; tick++) {
-            sums = [];
-            replicate_apoptosis_values.forEach(function (replicate_values) { 
-                if (replicate_values[tick] !== undefined) {
-                    sums[tick] = (sums[tick] || 0)+replicate_values[tick];
-                }
-            });
-            apoptosis_mean[tick] = sums[tick]/replicates.length;
-            sums = [];
-            replicate_growth_arrest_values.forEach(function (replicate_values) {
-                if (replicate_values[tick] !== undefined) {
-                   sums[tick] = (sums[tick] || 0)+replicate_values[tick];
-                }
-            });
-            growth_arrest_mean[tick] = sums[tick]/replicates.length;
-            sums = [];
-            replicate_proliferation_values.forEach(function (replicate_values) { 
-                if (replicate_values[tick] !== undefined) {
-                    sums[tick] = (sums[tick] || 0)+replicate_values[tick];
-                }
-            });
-            proliferation_mean[tick] = sums[tick]/replicates.length;
-            sums = [];
-            replicate_necrosis_values.forEach(function (replicate_values) {
-                if (replicate_values[tick] !== undefined) { 
-                    sums[tick] = (sums[tick] || 0)+replicate_values[tick];
-                }
-            });
-            necrosis_mean[tick] = sums[tick]/replicates.length;
-        };
-        for (tick = 1; tick < last_tick; tick++) {
+            apoptosis_mean[tick]     = mean(tick, replicate_apoptosis_values);
+            growth_arrest_mean[tick] = mean(tick, replicate_growth_arrest_values);
+            proliferation_mean[tick] = mean(tick, replicate_proliferation_values);
+            necrosis_mean[tick]      = mean(tick, replicate_necrosis_values);
             apoptosis_standard_deviation[tick]      = standard_deviation(tick, replicate_apoptosis_values, apoptosis_mean);
             growth_arrest_standard_deviation[tick]  = standard_deviation(tick, replicate_growth_arrest_values, growth_arrest_mean);
             proliferation_standard_deviation[tick]  = standard_deviation(tick, replicate_proliferation_values, proliferation_mean);
