@@ -190,8 +190,8 @@
             display_all( "all-apoptosis",  "Apoptosis", replicate_apoptosis_values, apoptosis_mean, apoptosis_standard_deviation);
         }
         if (growth_arrest_mean[growth_arrest_mean.length-1]) {
-            display_mean("mean-growth_arrestn", "Growth arrest", growth_arrest_mean, growth_arrest_standard_deviation);
-            display_all( "all-growth_arrestn",  "Growth arrest", replicate_growth_arrest_values, growth_arrest_mean, growth_arrest_standard_deviation);
+            display_mean("mean-growth_arrest", "Growth arrest", growth_arrest_mean, growth_arrest_standard_deviation);
+            display_all( "all-growth_arrest",  "Growth arrest", replicate_growth_arrest_values, growth_arrest_mean, growth_arrest_standard_deviation);
         }
         if (necrosis_mean[necrosis_mean.length-1]) {
             display_mean("mean-necrosis", "Necrosis", necrosis_mean, necrosis_standard_deviation);
