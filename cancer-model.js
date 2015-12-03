@@ -331,22 +331,27 @@
     var display_all = function(id, label, all_values, mean_values, standard_deviation_values) {
         // all_values is an array of arrays
 
-        var myArrays = [[1,2,3,4,5],[2,4,6,7,8],[5,8,10,11,22]];
-
         var data = [];
 
-        myArrays.forEach(function(run){
+        all_values.forEach(function(run, index){
+            var runNum = index + 1;
+            var alphaVal = 1 - 2*index/100
             data.push({
-                x: run,
+                y: run,
                 type: "scatter",
-                mode: "lines"
+                mode: "lines",
+                name: "Run " + runNum,
+                line:{
+                    shape:"linear",
+                    color:"rgba(31, 119, 180," + alphaVal + ")" 
+                }
             });
         });
 
-        console.log(data)
-
         var layout = {
-            title: "Cell " + label.toLowerCase() + " rate for all 500 simulations"
+            title: "Cell " + label.toLowerCase() + " rate for all 500 simulations",
+            showlegend: false,
+            hovermode: "closest"
         };
 
         Plotly.newPlot(id, data, layout);
