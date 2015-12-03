@@ -330,11 +330,20 @@
 
     var display_all = function(id, label, all_values, mean_values, standard_deviation_values) {
         // all_values is an array of arrays
-        var data = [
-        {
-            y: all_values,
-            type: 'scatter',
-        }];
+
+        var myArrays = [[1,2,3,4,5],[2,4,6,7,8],[5,8,10,11,22]];
+
+        var data = [];
+
+        myArrays.forEach(function(run){
+            data.push({
+                x: run,
+                type: "scatter",
+                mode: "lines"
+            });
+        });
+
+        console.log(data)
 
         var layout = {
             title: "Cell " + label.toLowerCase() + " rate for all 500 simulations"
