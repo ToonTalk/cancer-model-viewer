@@ -9,13 +9,13 @@
 
  	var replicate_states = [];                      // an array of cell_states for each replicate (run of the model) - index is tick number
 
- 	var replicate_apoptosis_values = [];                      // an array an array of the cummulative number of apoptosis events for each replicate - index is tick number
+ 	var replicate_apoptosis_values = [];            // an array an array of the cummulative number of apoptosis events for each replicate - index is tick number
 
- 	var replicate_growth_arrest_values = [];                  // an array an array of the cummulative number of growth_arrest events for each replicate - index is tick number
+ 	var replicate_growth_arrest_values = [];        // an array an array of the cummulative number of growth_arrest events for each replicate - index is tick number
 
- 	var replicate_proliferation_values = [];                  // an array an array of the cummulative number of proliferation events for each replicate - index is tick number
+ 	var replicate_proliferation_values = [];        // an array an array of the cummulative number of proliferation events for each replicate - index is tick number
 
- 	var replicate_necrosis_values = [];                       // an array an array of the cummulative number of necrosis events for each replicate - index is tick number
+ 	var replicate_necrosis_values = [];             // an array an array of the cummulative number of necrosis events for each replicate - index is tick number
 
  	var apoptosis_mean = [];                        // the mean apoptosis values at each tick
 
@@ -73,13 +73,13 @@
         display_cell = running_3D ? display_cell_3D : display_cell_2D;
         clear_all    = running_3D ? clear_all_3D    : clear_all_2D;
         replicates.forEach(function (replicate) {
-            var cell_numbers = [];        // ids of cells currently alive
- 	   	    var current_cell_states = []; // the graphical state of each current cell
- 	   	    var cell_states = [];         // index is the tick number and the contents are the visual states of cells current at that time
- 	   	    var apoptosis_values = [];                      // an array of the cummulative number of apoptosis events for this replicate - index is tick number
-            var growth_arrest_values = [];                  // an array of the cummulative number of growth_arrest events for this replicate - index is tick number
-            var proliferation_values = [];                  // an array of the cummulative number of proliferation events for this replicate - index is tick number
-            var necrosis_values = [];                       // an array of the cummulative number of necrosis events for this replicate - index is tick number
+            var cell_numbers = [];                // ids of cells currently alive
+ 	   	    var current_cell_states = [];         // the graphical state of each current cell
+ 	   	    var cell_states = [];                 // index is the tick number and the contents are the visual states of cells current at that time
+ 	   	    var apoptosis_values = [];            // an array of the cummulative number of apoptosis events for this replicate - index is tick number
+            var growth_arrest_values = [];        // an array of the cummulative number of growth_arrest events for this replicate - index is tick number
+            var proliferation_values = [];        // an array of the cummulative number of proliferation events for this replicate - index is tick number
+            var necrosis_values = [];             // an array of the cummulative number of necrosis events for this replicate - index is tick number
             var necrosis_standard_deviation = [];
  	   	    var current_apoptosis     = 0;
  	   	    var current_growth_arrest = 0;
@@ -141,35 +141,31 @@
             document.getElementById('canvases').appendChild(canvas);
             canvases.push(canvas);
         });
-//         apoptosis_mean[1]     = 0;
-        growth_arrest_mean[1] = 0;
-        proliferation_mean[1] = 0;
-        necrosis_mean[1]      = 0;
         for (tick = 1; tick < last_tick; tick++) {
             sums = [];
             replicate_apoptosis_values.forEach(function (replicate_values) { 
-                if (replicate_values[tick]) {
+                if (replicate_values[tick] !== undefined) {
                     sums[tick] = (sums[tick] || 0)+replicate_values[tick];
                 }
             });
             apoptosis_mean[tick] = sums[tick]/replicates.length;
             sums = [];
             replicate_growth_arrest_values.forEach(function (replicate_values) {
-                if (replicate_values[tick]) {
+                if (replicate_values[tick] !== undefined) {
                    sums[tick] = (sums[tick] || 0)+replicate_values[tick];
                 }
             });
             growth_arrest_mean[tick] = sums[tick]/replicates.length;
             sums = [];
             replicate_proliferation_values.forEach(function (replicate_values) { 
-                if (replicate_values[tick]) {
+                if (replicate_values[tick] !== undefined) {
                     sums[tick] = (sums[tick] || 0)+replicate_values[tick];
                 }
             });
             proliferation_mean[tick] = sums[tick]/replicates.length;
             sums = [];
             replicate_necrosis_values.forEach(function (replicate_values) {
-                if (replicate_values[tick]) { 
+                if (replicate_values[tick] !== undefined) { 
                   sums[tick] = (sums[tick] || 0)+replicate_values[tick];
                 }
             });
