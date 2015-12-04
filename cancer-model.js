@@ -212,7 +212,7 @@
         context_2D.stroke();
     };
 
-    var clear_all_2D = function (tick) {
+    var clear_all_2D = function (canvases, tick) {
         canvases.forEach(function (canvas, index) {
             if (tick < replicates.length) {
                 // don't clear if on the last frame
@@ -264,7 +264,7 @@
             }
             if (tick <= last_tick) {
                 setTimeout(function () {
-                               clear_all(tick);
+                               clear_all(canvases, tick);
                                display_frame();
                            },
                            frame_duration);
