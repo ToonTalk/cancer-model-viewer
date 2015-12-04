@@ -41,24 +41,32 @@
 
     var expanded_size = 20;                         // size when running expanded
 
-    var canvas_click_listener = function (event) {
+    var canvas_click_listener = function (event, index) {
         var canvas = event.target;
-        var new_canvas = document.createElement("canvas");
+        var new_canvas = document.createElement('canvas');
         var index = canvases.indexOf(event.target);
         var replicate_states_singleton = [replicate_states[index]];
         var canvases_singleton = [new_canvas];
-        var canvases_div = document.getElementById('canvases');
+        var caption_element = document.getElementById('canvases-caption');
         var remove_canvas = function () {
-            canvases_div.removeChild(canvas_and_caption_div);
+            canvas_and_caption_div.parentElement.removeChild(canvas_and_caption_div);
         }
         var time_monitor_id = "time-monitor-of-" + index;
         var canvas_and_caption_div = document.createElement('div');
         var caption = document.createElement('p');
+        var graphs = document.createElement('span');
+        graphs.id = "replicate-#" + index;
+        // perhaps better to set the dimensions using the Plotly API
+        graphs.style.width  = "600px";
+        graphs.style.height = "400px";
         caption.innerHTML = "Animation of replicate #" + (index+1) + " at time <span id='" + time_monitor_id + "'>0</span>. Click to remove it.";
         canvas_and_caption_div.appendChild(new_canvas);
+        canvas_and_caption_div.appendChild(graphs);
         canvas_and_caption_div.appendChild(caption);
-        canvases_div.insertBefore(canvas_and_caption_div, canvases_div.firstChild);
+        caption_element.parentElement.insertBefore(canvas_and_caption_div, caption_element);
         new_canvas.addEventListener('click', remove_canvas);
+        // following will be replaced with a single graph of all 4 measures
+        display_replicate(graphs.id, "Replicate #" + index, replicate_proliferation_values[index], replicate_apoptosis_values[index], replicate_growth_arrest_values[index], replicate_necrosis_values[index]);
         // animate this single replicate at a larger size
         animate_cells(replicate_states_singleton, canvases_singleton, expanded_size, 20, false, 2, time_monitor_id);
     };
@@ -101,7 +109,7 @@
         write_page();
         display_cell = running_3D ? display_cell_3D : display_cell_2D;
         clear_all    = running_3D ? clear_all_3D    : clear_all_2D;
-        replicates.forEach(function (replicate) {
+        replicates.forEach(function (replicate, index) {
             var cell_numbers = [];                // ids of cells currently alive
             var current_cell_states = [];         // the graphical state of each current cell
             var cell_states = [];                 // index is the tick number and the contents are the visual states of cells current at that time
@@ -166,7 +174,10 @@
             replicate_proliferation_values.push(proliferation_values);
             replicate_necrosis_values     .push(necrosis_values);
             canvas = document.createElement("canvas");
-            canvas.addEventListener('click', canvas_click_listener);
+            canvas.title = "Click to inspect replicate #" + (index+1);
+            canvas.addEventListener('click', function (event) {
+                                                 canvas_click_listener(event, index);
+                                             });
             document.getElementById('canvases').appendChild(canvas);
             canvases.push(canvas);
         });
@@ -276,9 +287,12 @@
     };
 
     var write_page = function () {
-            var addParagraph = function (html) {
+        var addParagraph = function (html, id) {
             var p = document.createElement('p');
             p.innerHTML = html;
+            if (id) {
+                p.id = id;
+            }
             document.body.appendChild(p);
         };
         var addDiv = function (id) {
@@ -288,7 +302,7 @@
         };
         addParagraph("Results from running the cancer model with these settings:");
         addParagraph("<i>to be done</i>");
-        addParagraph("Here is an animation of the model replicated " + replicates.length + " times. Current time is " + "<span id='canvases-time'>0</span>. To inspect a replicate click on it.");
+        addParagraph("The following are animations of the model replicated " + replicates.length + " times. Current time is " + "<span id='canvases-time'>0</span>. To inspect a replicate click on it.", "canvases-caption");
         addDiv('canvases');
         addParagraph("Averaged simulation data:");
         addDiv('mean-proliferation');
@@ -355,6 +369,12 @@
         };
 
         Plotly.newPlot(id, data, layout);
+    };
+
+    var display_replicate = function (id, label, proliferation_values, apoptosis_values, growth_arrest_values, necrosis_values) {
+        // this will display all four measures on a single graphs
+        // quick fix:
+        display_all(id, label, [proliferation_values]);
     };
 
     var context_2D,     // used to draw upon the 2D canvas
