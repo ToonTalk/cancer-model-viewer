@@ -379,8 +379,9 @@
 
     var display_replicate = function (id, label, proliferation_values, apoptosis_values, growth_arrest_values, necrosis_values) {
         // this will display all four measures on a single graph
+        // what would be cool would be if this graph was drawn in sync with the animation -- consider only if easy to do
         // quick fix for now:
-        display_all(id, label, [proliferation_values]);
+        display_all(id, label, [proliferation_values, apoptosis_values, growth_arrest_values, necrosis_values]);
     };
 
     var context_2D,     // used to draw upon the 2D canvas
