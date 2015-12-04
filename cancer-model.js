@@ -55,6 +55,7 @@
         var canvas_and_caption_div = document.createElement('div');
         var caption = document.createElement('p');
         var graphs = document.createElement('span');
+        canvas_and_caption_div.title = "Click to close inspection of replicate #" + (index+1) + ".";
         graphs.id = "replicate-#" + index;
         // perhaps better to set the dimensions using the Plotly API
         graphs.style.width  = "600px";
@@ -65,8 +66,7 @@
         canvas_and_caption_div.appendChild(caption);
         caption_element.parentElement.insertBefore(canvas_and_caption_div, caption_element);
         new_canvas.addEventListener('click', remove_canvas);
-        // following will be replaced with a single graph of all 4 measures
-        display_replicate(graphs.id, "Replicate #" + index, replicate_proliferation_values[index], replicate_apoptosis_values[index], replicate_growth_arrest_values[index], replicate_necrosis_values[index]);
+        display_replicate(graphs.id, "Cell events for replicate #" + (index+1), replicate_proliferation_values[index], replicate_apoptosis_values[index], replicate_growth_arrest_values[index], replicate_necrosis_values[index]);
         // animate this single replicate at a larger size
         animate_cells(replicate_states_singleton, canvases_singleton, expanded_size, 20, false, 2, time_monitor_id);
     };
@@ -100,6 +100,12 @@
                 return Math.sqrt(sum_of_square_of_difference[tick]/(sample_count-1));
             } 
             return 0;
+        };
+        var display_mean_label = function (event_type) {
+            return "Mean cummulative " + event_type + " events averaged over " + replicates.length + " simulation runs";
+        };
+        var display_all_label = function (event_type) {
+            return "Cummulative " + event_type + " events for all " + replicates.length + " simulation runs";
         };
         var tick, events;
         if (typeof l === 'undefined') { // the log has the short name 'l' to keep down bandwidth and file sizes
@@ -193,20 +199,20 @@
         }
         if (proliferation_mean[proliferation_mean.length-1]) {
             // not all zeros
-            display_mean("mean-proliferation", "Proliferation", proliferation_mean, proliferation_standard_deviation);
-            display_all( "all-proliferation",  "Proliferation", replicate_proliferation_values, proliferation_mean, proliferation_standard_deviation);
+            display_mean("mean-proliferation", display_mean_label("proliferation"), proliferation_mean, proliferation_standard_deviation);
+            display_all( "all-proliferation",  display_all_label ("proliferation"), replicate_proliferation_values);
         }
         if (apoptosis_mean[apoptosis_mean.length-1]) {
-            display_mean("mean-apoptosis", "Apoptosis", apoptosis_mean, apoptosis_standard_deviation);
-            display_all( "all-apoptosis",  "Apoptosis", replicate_apoptosis_values, apoptosis_mean, apoptosis_standard_deviation);
+            display_mean("mean-apoptosis", display_mean_label("apoptosis"), apoptosis_mean, apoptosis_standard_deviation);
+            display_all( "all-apoptosis",  display_all_label ("apoptosis"), replicate_apoptosis_values, apoptosis_mean, apoptosis_standard_deviation);
         }
         if (growth_arrest_mean[growth_arrest_mean.length-1]) {
-            display_mean("mean-growth_arrest", "Growth arrest", growth_arrest_mean, growth_arrest_standard_deviation);
-            display_all( "all-growth_arrest",  "Growth arrest", replicate_growth_arrest_values, growth_arrest_mean, growth_arrest_standard_deviation);
+            display_mean("mean-growth_arrest", display_mean_label("growth arrest"), growth_arrest_mean, growth_arrest_standard_deviation);
+            display_all( "all-growth_arrest",  display_all_label ("growth arrest"), replicate_growth_arrest_values, growth_arrest_mean, growth_arrest_standard_deviation);
         }
         if (necrosis_mean[necrosis_mean.length-1]) {
-            display_mean("mean-necrosis", "Necrosis", necrosis_mean, necrosis_standard_deviation);
-            display_all( "all-necrosis",  "Necrosis", replicate_necrosis_values, necrosis_mean, necrosis_standard_deviation);
+            display_mean("mean-necrosis", display_mean_label("necrosis"), necrosis_mean, necrosis_standard_deviation);
+            display_all( "all-necrosis",  display_all_label ("necrosis"), replicate_necrosis_values, necrosis_mean, necrosis_standard_deviation);
         }
         // run with animation time proportional to simulation time (if computer is fast enough)
         animate_cells(replicate_states, canvases, icon_size, 20, false, 20, 'canvases-time');
@@ -336,13 +342,13 @@
         }];
 
         var layout = {
-            title: "Mean cell " + label.toLowerCase() + " rate averaged over 500 simulations"
+            title: label
         };
 
         Plotly.newPlot(id, data, layout);
     };
 
-    var display_all = function(id, label, all_values, mean_values, standard_deviation_values) {
+    var display_all = function(id, label, all_values) {
         // all_values is an array of arrays
 
         var data = [];
@@ -363,7 +369,7 @@
         });
 
         var layout = {
-            title: "Cell " + label.toLowerCase() + " rate for all 500 simulations",
+            title: label,
             showlegend: false,
             hovermode: "closest"
         };
@@ -372,8 +378,8 @@
     };
 
     var display_replicate = function (id, label, proliferation_values, apoptosis_values, growth_arrest_values, necrosis_values) {
-        // this will display all four measures on a single graphs
-        // quick fix:
+        // this will display all four measures on a single graph
+        // quick fix for now:
         display_all(id, label, [proliferation_values]);
     };
 
