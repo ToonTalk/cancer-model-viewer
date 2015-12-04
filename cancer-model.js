@@ -9,13 +9,13 @@
 
     var replicate_states = [];                      // an array of cell_states for each replicate (run of the model) - index is tick number
 
-    var replicate_apoptosis_values = [];            // an array an array of the cummulative number of apoptosis events for each replicate - index is tick number
+    var replicate_apoptosis_values = [];            // an array an array of the cumulative number of apoptosis events for each replicate - index is tick number
 
-    var replicate_growth_arrest_values = [];        // an array an array of the cummulative number of growth_arrest events for each replicate - index is tick number
+    var replicate_growth_arrest_values = [];        // an array an array of the cumulative number of growth_arrest events for each replicate - index is tick number
 
-    var replicate_proliferation_values = [];        // an array an array of the cummulative number of proliferation events for each replicate - index is tick number
+    var replicate_proliferation_values = [];        // an array an array of the cumulative number of proliferation events for each replicate - index is tick number
 
-    var replicate_necrosis_values = [];             // an array an array of the cummulative number of necrosis events for each replicate - index is tick number
+    var replicate_necrosis_values = [];             // an array an array of the cumulative number of necrosis events for each replicate - index is tick number
 
     var apoptosis_mean = [];                        // the mean apoptosis values at each tick
 
@@ -102,10 +102,10 @@
             return 0;
         };
         var display_mean_label = function (event_type) {
-            return "Mean cummulative " + event_type + " events averaged over " + replicates.length + " simulation runs";
+            return "Mean cumulative " + event_type + " events averaged over " + replicates.length + " simulation runs";
         };
         var display_all_label = function (event_type) {
-            return "Cummulative " + event_type + " events for all " + replicates.length + " simulation runs";
+            return "cumulative " + event_type + " events for all " + replicates.length + " simulation runs";
         };
         var tick, events;
         if (typeof l === 'undefined') { // the log has the short name 'l' to keep down bandwidth and file sizes
@@ -119,10 +119,10 @@
             var cell_numbers = [];                // ids of cells currently alive
             var current_cell_states = [];         // the graphical state of each current cell
             var cell_states = [];                 // index is the tick number and the contents are the visual states of cells current at that time
-            var apoptosis_values = [];            // an array of the cummulative number of apoptosis events for this replicate - index is tick number
-            var growth_arrest_values = [];        // an array of the cummulative number of growth_arrest events for this replicate - index is tick number
-            var proliferation_values = [];        // an array of the cummulative number of proliferation events for this replicate - index is tick number
-            var necrosis_values = [];             // an array of the cummulative number of necrosis events for this replicate - index is tick number
+            var apoptosis_values = [];            // an array of the cumulative number of apoptosis events for this replicate - index is tick number
+            var growth_arrest_values = [];        // an array of the cumulative number of growth_arrest events for this replicate - index is tick number
+            var proliferation_values = [];        // an array of the cumulative number of proliferation events for this replicate - index is tick number
+            var necrosis_values = [];             // an array of the cumulative number of necrosis events for this replicate - index is tick number
             var necrosis_standard_deviation = [];
             var current_apoptosis     = 0;
             var current_growth_arrest = 0;
