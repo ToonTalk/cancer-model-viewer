@@ -306,8 +306,10 @@
             div.id = id;
             document.body.appendChild(div);
         };
-        addParagraph("Results from running the cancer model with these settings:");
-        addParagraph("<i>to be done</i>");
+        var time_of_submission = Date.now();
+        var parameters_table = "<table class='parameters-table'><tr><th>Parameter</th><th>Value</th></tr>";
+        var i;
+        addParagraph("Results from running the cancer model at " + time_of_submission + ". See <a href='#parameters'>the parameters</a>.");
         addParagraph("The following are animations of the model replicated " + replicates.length + " times. Current time is " + "<span id='canvases-time'>0</span>. To inspect a replicate click on it.", "canvases-caption");
         addDiv('canvases');
         addParagraph("Averaged simulation data:");
@@ -320,6 +322,11 @@
         addDiv('all-apoptosis');
         addDiv('all-growth_arrest');
         addDiv('all-necrosis');
+        addParagraph("<h2 >Settings</h2>", 'parameters');
+        for (i = 0; i < parameters.length; i += 2) {
+            parameters_table += "<tr><td>" + parameters[i] + "</td><td>" + parameters[i+1] + "</td></tr>";
+        }
+        addParagraph(parameters_table + '</table>');
     };
 
     var display_mean = function(id, label, mean_values, standard_deviation_values) {
