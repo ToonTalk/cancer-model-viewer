@@ -107,9 +107,12 @@
         var display_all_label = function (event_type) {
             return "cumulative " + event_type + " events for all " + replicates.length + " simulation runs";
         };
+        // log file is same as HTML but with LOG extension
+        var log_url = window.location.pathname.substring(0, window.location.pathname.length-4) + "log";
         var tick, events;
-        if (typeof l === 'undefined') { // the log has the short name 'l' to keep down bandwidth and file sizes
-            document.write("Simulation is not finished. Please refresh this page later.");
+        if (typeof l === 'undefined' || replicates.length === 0) { 
+            // the log has the short name 'l' to keep down bandwidth and file sizes
+            document.write("Simulation is not finished. Please refresh this page later. See the <a href='" + log_url + "' target='_blank'>server log file</a>.");
             return;
         }
         write_page();
@@ -308,7 +311,7 @@
         };
         var parameters_table = "<table class='parameters-table'><tr><th>Parameter</th><th>Value</th></tr>";
         var i;
-        addParagraph("<h1>" + replicates.length + " out of " + numberOfReplicatesRequested + " results from running the cancer model</h1>");
+        addParagraph("<h1>" + replicates.length + " out of " + number_of_replicates_requested + " results from running the cancer model</h1>");
         addParagraph("Submitted at " + start_time + ". See <a href='#parameters'>the parameters</a>.");
         addParagraph("<h2>Animation of cells</h2>");
         addParagraph("Replay time is " + "<span id='canvases-time'>0</span>. To inspect a replicate click on it.", "canvases-caption");
