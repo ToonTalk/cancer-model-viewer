@@ -1,0 +1,5 @@
+"DNA_damage" 0
+"EGFR_stimulus" 0
+"TGFBR_stimulus" 0
+"FGFR3_stimulus" 0
+"Oxygen_supply" 0

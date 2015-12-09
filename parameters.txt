@@ -1,0 +1,4 @@
+set the-number-of-replicates 48.0
+set the-egf-diffusion-coefficient 2.7E-14
+set the-oxygen-diffusion-coefficient 1.0E-9
+set the-start-time "2015-12-07 15:42"
