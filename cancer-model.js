@@ -1,6 +1,6 @@
  /**
  * Implements the processing of logs from running the cancer model
- * Authors: Ken Kahn
+ * Authors: Ken Kahn and Martin Hadley
  * License: to be decided
  */
 
@@ -39,7 +39,7 @@
 
     var icon_size = 5;                              // size when an icon
 
-    var expanded_size = 20;                         // size when running expanded
+    var expanded_size = 16;                         // size when running expanded
 
     var canvas_click_listener = function (event, index) {
         var canvas = event.target;
@@ -49,26 +49,40 @@
         var canvases_singleton = [new_canvas];
         var caption_element = document.getElementById('canvases-caption');
         var remove_canvas = function () {
-            canvas_and_caption_div.parentElement.removeChild(canvas_and_caption_div);
+            animation_and_graph_table.parentElement.removeChild(animation_and_graph_table);
         }
         var time_monitor_id = "time-monitor-of-" + index;
-        var canvas_and_caption_div = document.createElement('div');
+        var animation_and_graph_table = document.createElement('table');
+        var animation_row             = document.createElement('tr');
+        var graph_row                 = document.createElement('tr');
+        var animation_table_header    = document.createElement('td');
+        var animation_table_cell      = document.createElement('td');
+        var graph_table_header        = document.createElement('td');
+        var graph_table_cell          = document.createElement('td');
+        var close_button              = document.createElement('button');
         var caption = document.createElement('p');
-        var graphs = document.createElement('span');
-        canvas_and_caption_div.title = "Click to close inspection of replicate #" + (index+1) + ".";
+        var graphs = document.createElement('div');
+        animation_and_graph_table.title = "Click to close this inspection of replicate #" + (index+1) + ".";
+        caption.innerHTML = "Animation of replicate #" + (index+1) + " at time <span id='" + time_monitor_id + "'>0</span>.";
+        animation_table_header.appendChild(caption);
+        graph_table_header.textContent = "Data from replicate #" + (index+1);
+        animation_row.appendChild(animation_table_header);
+        graph_row.appendChild(graph_table_header);
+        animation_row.appendChild(new_canvas);
+        graph_row.appendChild(graphs);
+        animation_and_graph_table.appendChild(animation_row);
+        animation_and_graph_table.appendChild(graph_row);
+        animation_and_graph_table.appendChild(close_button);
+        close_button.textContent = "Close inspection of replicate #" + (index+1);
         graphs.id = "replicate-#" + index;
         // perhaps better to set the dimensions using the Plotly API
         graphs.style.width  = "600px";
         graphs.style.height = "400px";
-        caption.innerHTML = "Animation of replicate #" + (index+1) + " at time <span id='" + time_monitor_id + "'>0</span>. Click to remove it.";
-        canvas_and_caption_div.appendChild(new_canvas);
-        canvas_and_caption_div.appendChild(graphs);
-        canvas_and_caption_div.appendChild(caption);
-        caption_element.parentElement.insertBefore(canvas_and_caption_div, caption_element);
-        new_canvas.addEventListener('click', remove_canvas);
-        display_replicate(graphs.id, "Cell events for replicate #" + (index+1), replicate_proliferation_values[index], replicate_apoptosis_values[index], replicate_growth_arrest_values[index], replicate_necrosis_values[index]);
+        caption_element.parentElement.insertBefore(animation_and_graph_table, caption_element);
+        close_button.addEventListener('click', remove_canvas);
         // animate this single replicate at a larger size
         animate_cells(replicate_states_singleton, canvases_singleton, expanded_size, 20, false, 2, time_monitor_id);
+        display_replicate(graphs.id, "Cell events for replicate #" + (index+1), replicate_proliferation_values[index], replicate_apoptosis_values[index], replicate_growth_arrest_values[index], replicate_necrosis_values[index]);
     };
 
     var initialize = function () {
@@ -353,10 +367,11 @@
         }];
 
         var layout = {
-            title: label
+            title: label,
+            autosize: true
         };
 
-        Plotly.newPlot(id, data, layout);
+        Plotly.newPlot(id, data, layout, {showLink: true});
     };
 
     var display_all = function(id, label, all_values) {
@@ -382,17 +397,106 @@
         var layout = {
             title: label,
             showlegend: false,
-            hovermode: "closest"
+            hovermode: "closest",
+            autosize: true
         };
 
-        Plotly.newPlot(id, data, layout);
+        Plotly.newPlot(id, data, layout, {showLink: true});
     };
 
     var display_replicate = function (id, label, proliferation_values, apoptosis_values, growth_arrest_values, necrosis_values) {
         // this will display all four measures on a single graph
         // what would be cool would be if this graph was drawn in sync with the animation -- consider only if easy to do
         // quick fix for now:
-        display_all(id, label, [proliferation_values, apoptosis_values, growth_arrest_values, necrosis_values]);
+
+        var data = [
+            {
+                name: "Proliferation Rate",
+                type: "scatter",
+                mode: "lines",
+                y: proliferation_values
+            },
+            {
+                name: "Apoptosis Rate",
+                type: "scatter",
+                mode: "lines",
+                y: apoptosis_values,
+                yaxis:"y2"       
+            },
+            {
+                name: "Growth Arrest Rate",
+                type: "scatter",
+                mode: "lines",
+                y: growth_arrest_values,
+                yaxis:"y3"        
+            },
+            {
+                name: "Necrosis Rate",
+                type: "scatter",
+                mode: "lines",
+                y: necrosis_values,
+                yaxis:"y4"   
+            }
+            ];
+
+        var layout = {
+            yaxis:{
+                type:"linear",
+                autorange:true,
+                showline:true,
+                linecolor:"rgb(31, 119, 180)",
+                title: "Proliferation Rate",
+                zeroline: false
+            },
+            xaxis:{
+                type:"linear",
+                autorange:true,
+                anchor:"free",
+                domain:[0,0.8], // Domain allows for additional y-axes to be displayed to the right
+                showline:true,
+                title:"Time",
+                zeroline: false
+            },
+            yaxis2:{
+                overlaying:"y",
+                side:"right",
+                anchor:"free",
+                showline:true,
+                linecolor:"rgb(255, 127, 14)",
+                position:0.8, // Positions y-axis at edge of the x-axis domain
+                rangemode:"normal",
+                type:"linear",
+                autorange:true,
+                ticks:"inside",
+            },
+            yaxis3:{
+                overlaying:"y",
+                side:"right",
+                anchor:"free",
+                position:0.88, // Position to the right of the chart
+                showline:true,
+                linecolor:"rgb(44, 160, 44)",
+                type:"linear",
+                autorange:true,
+                ticks:"inside",
+            },
+            yaxis4:{
+                overlaying:"y",
+                side:"right",
+                anchor:"free",
+                showline:true,
+                linecolor:"rgb(214, 39, 40)",
+                position:0.95, // Position to the right of the chart
+                ticks:"inside",
+                type:"linear",
+                autorange:true,
+            },
+            title: label,
+            showlegend: true,
+            hovermode: "x"
+        };
+
+        Plotly.newPlot(id, data, layout, {showLink: true});
     };
 
     var context_2D,     // used to draw upon the 2D canvas
