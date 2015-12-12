@@ -129,6 +129,10 @@
             document.write("Simulation is not finished. Please refresh this page later. See the <a href='" + log_url + "' target='_blank'>server log file</a>.");
             return;
         }
+        if (running_3D && typeof display_cell_3D === 'undefined') {
+            // not yet implemented
+            running_3D = false;
+        }
         write_page();
         display_cell = running_3D ? display_cell_3D : display_cell_2D;
         clear_all    = running_3D ? clear_all_3D    : clear_all_2D;
@@ -269,7 +273,7 @@
                     return; // this replicate is finished
                 }
                 // set canvas size as just a little bit bigger than needed
-                canvas.width  = (2+maximum_x-minimum_x) *scale;
+                canvas.width  = (2+maximum_x-minimum_x)*scale;
                 canvas.height = (2+maximum_y-minimum_y)*scale;
                 if (!running_3D) {
                     context_2D = canvas.getContext("2d");
