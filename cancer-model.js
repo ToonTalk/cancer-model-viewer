@@ -129,10 +129,6 @@
             document.write("Simulation is not finished. Please refresh this page later. See the <a href='" + log_url + "' target='_blank'>server log file</a>.");
             return;
         }
-        if (running_3D && typeof display_cell_3D === 'undefined') {
-            // not yet implemented
-            running_3D = false;
-        }
         write_page();
         display_cell = running_3D ? display_cell_3D : display_cell_2D;
         clear_all    = running_3D ? clear_all_3D    : clear_all_2D;
@@ -273,7 +269,7 @@
                     return; // this replicate is finished
                 }
                 // set canvas size as just a little bit bigger than needed
-                canvas.width  = (2+maximum_x-minimum_x)*scale;
+                canvas.width  = (2+maximum_x-minimum_x) *scale;
                 canvas.height = (2+maximum_y-minimum_y)*scale;
                 if (!running_3D) {
                     context_2D = canvas.getContext("2d");
@@ -439,7 +435,7 @@
                 type: "scatter",
                 mode: "lines",
                 y: necrosis_values,
-                yaxis:"y4"   
+                yaxis:"y4"
             }
             ];
 
@@ -450,7 +446,8 @@
                 showline:true,
                 linecolor:"rgb(31, 119, 180)",
                 title: "Proliferation Rate",
-                zeroline: false
+                zeroline: false,
+                rangemode: "nonnegative"
             },
             xaxis:{
                 type:"linear",
@@ -470,8 +467,8 @@
                 position:0.8, // Positions y-axis at edge of the x-axis domain
                 rangemode:"normal",
                 type:"linear",
-                autorange:true,
                 ticks:"inside",
+                rangemode: "nonnegative"
             },
             yaxis3:{
                 overlaying:"y",
@@ -481,8 +478,8 @@
                 showline:true,
                 linecolor:"rgb(44, 160, 44)",
                 type:"linear",
-                autorange:true,
                 ticks:"inside",
+                rangemode: "nonnegative"
             },
             yaxis4:{
                 overlaying:"y",
@@ -493,7 +490,7 @@
                 position:0.95, // Position to the right of the chart
                 ticks:"inside",
                 type:"linear",
-                autorange:true,
+                rangemode: "nonnegative"
             },
             title: label,
             showlegend: true,
