@@ -9,6 +9,8 @@
 
     var replicate_states = [];                      // an array of cell_states for each replicate (run of the model) - index is tick number
 
+    var previous_replicate_states_singleton;        // a singleton array containing the replicate currently animating
+
     var replicate_apoptosis_values = [];            // an array an array of the cumulative number of apoptosis events for each replicate - index is tick number
 
     var replicate_growth_arrest_values = [];        // an array an array of the cumulative number of growth_arrest events for each replicate - index is tick number
@@ -41,15 +43,17 @@
 
     var expanded_size = 16;                         // size when running expanded
 
+    var scene, camera, renderer, 
+        statistics_3D, webGL_output;                // for displaying 3D
+
     var canvas_click_listener = function (event, index) {
         var canvas = event.target;
-        var new_canvas = document.createElement('canvas');
         var index = canvases.indexOf(event.target);
         var replicate_states_singleton = [replicate_states[index]];
-        var canvases_singleton = [new_canvas];
         var caption_element = document.getElementById('canvases-caption');
         var remove_canvas = function () {
             animation_and_graph_table.parentElement.removeChild(animation_and_graph_table);
+            replicate_states_singleton[0] = null; // to stop the animation
         }
         var time_monitor_id = "time-monitor-of-" + index;
         var animation_and_graph_table = document.createElement('table');
@@ -60,19 +64,34 @@
         var graph_table_header        = document.createElement('td');
         var graph_table_cell          = document.createElement('td');
         var close_button              = document.createElement('button');
+        var close_button_and_catption = document.createElement('div');
         var caption = document.createElement('p');
         var graphs = document.createElement('div');
-        animation_and_graph_table.title = "Click to close this inspection of replicate #" + (index+1) + ".";
-        caption.innerHTML = "Animation of replicate #" + (index+1) + " at time <span id='" + time_monitor_id + "'>0</span>.";
-        animation_table_header.appendChild(caption);
+        var new_canvas, canvases_singleton;
+        if (previous_replicate_states_singleton) {
+        	// stop the previous animation
+        	previous_replicate_states_singleton[0] = null;
+        }
+//         animation_and_graph_table.title = "Click to close this inspection of replicate #" + (index+1) + ".";
+        caption.innerHTML = "<tr><td>Animation of replicate #" + (index+1) + " at time <span id='" + time_monitor_id + "'>0</span>.</td></tr>";
+//         animation_table_header.appendChild(caption);
         graph_table_header.textContent = "Data from replicate #" + (index+1);
-        animation_row.appendChild(animation_table_header);
+//         animation_row.appendChild(animation_table_header);
         graph_row.appendChild(graph_table_header);
-        animation_row.appendChild(new_canvas);
+        if (running_3D) {
+//             animation_row.appendChild(statistics_3D);
+            animation_row.appendChild(webGL_output);
+        } else {
+            new_canvas = document.createElement('canvas');
+            canvases_singleton = [new_canvas];
+            animation_row.appendChild(new_canvas);
+        }    
         graph_row.appendChild(graphs);
+        close_button_and_catption.appendChild(caption);
+        close_button_and_catption.appendChild(close_button);
+        animation_and_graph_table.appendChild(close_button_and_catption);
         animation_and_graph_table.appendChild(animation_row);
         animation_and_graph_table.appendChild(graph_row);
-        animation_and_graph_table.appendChild(close_button);
         close_button.textContent = "Close inspection of replicate #" + (index+1);
         graphs.id = "replicate-#" + index;
         // perhaps better to set the dimensions using the Plotly API
@@ -83,6 +102,7 @@
         // animate this single replicate at a larger size
         animate_cells(replicate_states_singleton, canvases_singleton, expanded_size, 20, false, 2, time_monitor_id);
         display_replicate(graphs.id, "Cell events for replicate #" + (index+1), replicate_proliferation_values[index], replicate_apoptosis_values[index], replicate_growth_arrest_values[index], replicate_necrosis_values[index]);
+        previous_replicate_states_singleton = replicate_states_singleton;
     };
 
     var initialize = function () {
@@ -130,7 +150,6 @@
             return;
         }
         write_page();
-        display_cell = running_3D ? display_cell_3D : display_cell_2D;
         clear_all    = running_3D ? clear_all_3D    : clear_all_2D;
         replicates.forEach(function (replicate, index) {
             var cell_numbers = [];                // ids of cells currently alive
@@ -231,6 +250,9 @@
             display_mean("mean-necrosis", display_mean_label("necrosis"), necrosis_mean, necrosis_standard_deviation);
             display_all( "all-necrosis",  display_all_label ("necrosis"), replicate_necrosis_values, necrosis_mean, necrosis_standard_deviation);
         }
+        if (running_3D) {
+            initialise_3D();
+        }
         // run with animation time proportional to simulation time (if computer is fast enough)
         animate_cells(replicate_states, canvases, icon_size, 20, false, 20, 'canvases-time');
         // display changed frames every 100 milliseconds -- only works for a single canvas
@@ -246,46 +268,176 @@
         context_2D.stroke();
     };
 
-    var clear_all_2D = function (canvases, tick) {
+    var clear_all_2D = function (replicate_states, canvases, tick) {
         canvases.forEach(function (canvas, index) {
-            if (tick < replicates.length) {
+            if (tick < replicates[index].length) {
                 // don't clear if on the last frame
                 canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
             }
         }); 
     };
 
+    var initialise_3D = function () {
+        var step = 0;
+		var paused = 0;
+		var pausedstring = "";
+
+        statistics_3D = document.createElement('div');            
+        webGL_output  = document.createElement('div');
+//         statistics_3D.id = 'Stats-output'; // not used?
+//         webGL_output.id  = 'WebGL-output';
+		
+		//set up scene and camera
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
+		camera.userData = { keepMe: true };
+		
+		//create renderer object
+        renderer = new THREE.WebGLRenderer();
+        renderer.setClearColor(new THREE.Color(0xEEEEEE, 1.0));
+        renderer.shadowMapEnabled = true;
+        
+		//initialise click and drag rotation
+		controls = new THREE.OrbitControls( camera, renderer.domElement );
+		controls.enableDamping = true;
+		controls.dampingFactor = 0.25;
+		controls.enableZoom = false;
+		
+        // position and point the camera to the center of the scene
+        camera.position.x = -10;
+        camera.position.y = 15;
+        camera.position.z = 10;
+        camera.lookAt(scene.position);
+
+        // add ambient lighting
+        var ambientLight = new THREE.AmbientLight(0x0c0c0c);
+		ambientLight.userData = { keepMe: true };
+        scene.add(ambientLight);
+
+        //add upper spotlight (1)
+        var spotLight1 = new THREE.SpotLight(0xffffff);
+        spotLight1.position.set(-40, 60, -10);
+        spotLight1.castShadow = true;
+		spotLight1.userData = { keepMe: true };
+        scene.add(spotLight1);
+		
+		//add lower spotlight (2)
+        var spotLight2 = new THREE.SpotLight(0xffffff);
+        spotLight2.position.set(-40, -60, -10);
+        spotLight2.castShadow = true;
+		spotLight2.userData = { keepMe: true };
+        scene.add(spotLight2);
+
+        //add another spotlight (3)
+//         var spotLight3 = new THREE.SpotLight(0xffffff);
+//         spotLight3.position.set(40, -60, -50);
+//         spotLight3.castShadow = true;
+// 		   spotLight3.userData = { keepMe: true };
+//         scene.add(spotLight3);
+
+        // add the output of the renderer to the dom
+        webGL_output.appendChild(renderer.domElement);
+
+			//set up the dat.gui controls for steps-per-frame, pause, unpause and reset gui elements
+// 			var controls = new function () {
+//             this.stepsperframe = 5;
+// 			this.pause = function () {paused = 1; pausedstring = "PAUSED"}
+// 			this.unpause = function () {paused = 0; pausedstring = ""}
+// 			this.resetsteps = function () {step = 0; clearScene ();}
+// 											};
+// 			var gui = new dat.GUI();
+// 			gui.add(controls, 'stepsperframe').min(1).max(100).step(1);
+// 			gui.add(controls, 'pause')
+// 			gui.add(controls, 'unpause')
+// 			gui.add(controls, 'resetsteps')
+        
+		
+		//set up step count (and paused) text div
+// 		var stepcounttext = document.createElement('div');
+// 		stepcounttext.style.position = 'absolute';
+// 		stepcounttext.style.width = 100;
+// 		stepcounttext.style.height = 100;
+// 		stepcounttext.style.backgroundColor = "blue";
+// 		stepcounttext.innerHTML = "no ticks yet";
+// 		stepcounttext.style.top = 0 + 'px';
+// 		stepcounttext.style.left = 100 + 'px';
+// 		document.body.appendChild(stepcounttext);
+    };
+
+    var display_cell_3D = function (cell, scale, radius, color) {
+		var sphereGeometry = new THREE.SphereGeometry(0.75, radius*scale, radius*scale);
+		var sphereMaterial = new THREE.MeshPhongMaterial({color: color});
+		var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+		sphere.position.x = cell.x;
+		sphere.position.y = cell.y;
+		sphere.position.z = cell.z;
+		scene.add(sphere);
+// 		sphere.name = "cell_" + cell.who;
+    };
+
+    // a function to create a hitlist of killable meshes and kill them
+    var clear_all_3D = function (replicates, canvases, tick) {  	
+		var to_remove = [];
+		if (replicates[0] && tick >= replicates[0].length) {
+            // don't clear if on the last frame
+            return;
+		}
+		// alternatively the following could remove the last child first to avoid clobbering the structue as one traverses it
+		scene.traverse (function( child ) {
+                        if ( child instanceof THREE.Mesh) { //} && !child.userData.keepMe === true ) {
+                                to_remove.push( child );
+                        }});
+   	    for ( var i = 0; i < to_remove.length; i++ ) {
+			scene.remove( to_remove[i] );
+			// see http://stackoverflow.com/questions/12945092/memory-leak-with-three-js-and-many-shapes?rq=1
+			to_remove[i].geometry.dispose();
+			to_remove[i].material.dispose();
+        }
+    };
     var animate_cells = function (replicate_states, canvases, scale, frame_duration, skip_unchanging_frames, skip_every_n_frames, time_monitor_id, callback) {
         var tick = 1;
         var display_frame = function () {
+            // display 3D the selected replicate -- not the miniatures
+            var display_cell = running_3D && replicate_states.length === 1 ? display_cell_3D : display_cell_2D;
+            var colors = running_3D && replicate_states.length === 1 ? [0xDF5B54, 0xA4A4A4] : default_colors;
+            if (!replicate_states[0]) {
+            	// stopped
+            	return;
+            }
             if (document.getElementById(time_monitor_id)) {
                 document.getElementById(time_monitor_id).textContent = tick.toString();
             }
             replicate_states.forEach(function (cell_states, index) {
                 var cells = cell_states[tick];
-                var canvas = canvases[index];
                 var log = replicates[index];
+                var canvas;
                 if (!cells) {
                     return; // this replicate is finished
                 }
-                // set canvas size as just a little bit bigger than needed
-                canvas.width  = (2+maximum_x-minimum_x) *scale;
-                canvas.height = (2+maximum_y-minimum_y)*scale;
-                if (!running_3D) {
+                if (running_3D && replicate_states.length === 1) {             
+                    renderer.setSize(2*(2+maximum_x-minimum_x)*scale, 2*(2+maximum_y-minimum_y)*scale);
+                } else {
+                    canvas = canvases[index];
+                    // set canvas size as just a little bit bigger than needed
+                    canvas.width  = (2+maximum_x-minimum_x)*scale;
+                    canvas.height = (2+maximum_y-minimum_y)*scale;
                     context_2D = canvas.getContext("2d");
                 }
                 cells.forEach(function (cell) {
                      var radius = (cell.s || default_size)/2;
                      var color;
-                     if (typeof default_colors !== "undefined") {
-                         color = default_colors[cell.c || 0];
+                     if (typeof colors !== "undefined") {
+                         color = colors[cell.c || 0];
                      } else {
                          // backwards compatibility with old log files
                          color = cell.c || default_color
                      }
-                     color = display_cell(cell, scale, radius, color);
+                     display_cell(cell, scale, radius, color);
                 });
             });
+            if (running_3D && replicate_states.length === 1) {
+                renderer.render(scene, camera);
+            }
             tick++;
             if (skip_unchanging_frames) {
                 // find next time where an event was logged
@@ -298,7 +450,7 @@
             }
             if (tick <= last_tick) {
                 setTimeout(function () {
-                               clear_all(canvases, tick);
+                               clear_all(replicate_states, canvases, tick);
                                display_frame();
                            },
                            frame_duration);
@@ -435,7 +587,7 @@
                 type: "scatter",
                 mode: "lines",
                 y: necrosis_values,
-                yaxis:"y4"
+                yaxis:"y4"   
             }
             ];
 
@@ -446,8 +598,7 @@
                 showline:true,
                 linecolor:"rgb(31, 119, 180)",
                 title: "Proliferation Rate",
-                zeroline: false,
-                rangemode: "nonnegative"
+                zeroline: false
             },
             xaxis:{
                 type:"linear",
@@ -467,8 +618,8 @@
                 position:0.8, // Positions y-axis at edge of the x-axis domain
                 rangemode:"normal",
                 type:"linear",
+                autorange:true,
                 ticks:"inside",
-                rangemode: "nonnegative"
             },
             yaxis3:{
                 overlaying:"y",
@@ -478,8 +629,8 @@
                 showline:true,
                 linecolor:"rgb(44, 160, 44)",
                 type:"linear",
+                autorange:true,
                 ticks:"inside",
-                rangemode: "nonnegative"
             },
             yaxis4:{
                 overlaying:"y",
@@ -490,7 +641,7 @@
                 position:0.95, // Position to the right of the chart
                 ticks:"inside",
                 type:"linear",
-                rangemode: "nonnegative"
+                autorange:true,
             },
             title: label,
             showlegend: true,

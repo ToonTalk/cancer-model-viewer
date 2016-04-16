@@ -3,6 +3,11 @@
 <head>
 <meta charset='utf-8' />
 <link rel='stylesheet' media='all' href='../cancer-model.css' />
+<script type="text/javascript" src="../libs/three.js"></script>
+<script type="text/javascript" src="../libs/dat.gui.js"></script>
+<script type="text/javascript" src="../libs/stats.js"></script>
+<script type="text/javascript" src="../libs/OrbitControls.js"></script>
+<script type="text/javascript" src="../libs/rcolor.js"></script>
 <title>Results from running cancer simulation</title>
 <script src='../cancer-model.js'></script>
 <!-- Plotly.js -->
@@ -11,6 +16,8 @@
 var l = [];
 var s = [];
 var replicates = [];
+var number_of_replicates_requested = 50; // added manually
+var start_time = "start time filler"; // added manually
 var running_3D = true;
 var replicate_counter = 0;
 var minimum_x = Number.MAX_VALUE;
