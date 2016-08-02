@@ -5,6 +5,7 @@
  */
 
  (function () {
+ 	"strict"
     // create a local scope so there is no chance of name conflicts
 
     var replicate_states = [];                      // an array of cell_states for each replicate (run of the model) - index is tick number
@@ -478,7 +479,8 @@
         var parameters_table = "<table class='parameters-table'><tr><th>Parameter</th><th>Value</th></tr>";
         var i;
         addParagraph("<h1>" + replicates.length + " out of " + number_of_replicates_requested + " results from running the cancer model</h1>");
-        addParagraph("Submitted at " + start_time + ". See <a href='#parameters'>the parameters</a>.");
+        addParagraph("Submitted at " + start_time + ". See <a href='#parameters'>the parameters</a>" +
+                     (typeof mutations_file_contents === 'undefined' ? "." : " and <a href='#mutations'>the mutation settings</a>."));
         addParagraph("<h2>Animation of cells</h2>");
         addParagraph("Replay time is " + "<span id='canvases-time'>0</span>. To inspect a replicate click on it.", "canvases-caption");
         addDiv('canvases');
@@ -497,6 +499,10 @@
             parameters_table += "<tr><td>" + parameters[i] + "</td><td>" + parameters[i+1] + "</td></tr>";
         }
         addParagraph(parameters_table + '</table>');
+        if (mutations_file_contents) {
+        	addParagraph("<h2>Mutations</h2>", 'mutations');
+        	addParagraph(mutations_file_contents);
+        }
     };
 
     var display_mean = function(id, label, mean_values, standard_deviation_values) {
