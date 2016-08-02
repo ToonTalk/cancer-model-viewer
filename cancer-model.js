@@ -485,17 +485,18 @@
         var parameters_table = "<table class='parameters-table'><tr><th>Parameter</th><th>Value</th></tr>";
         var i;
         addParagraph("<h1>" + replicates.length + " out of " + number_of_replicates_requested + " results from running the cancer model</h1>");
-        addParagraph("Submitted at " + start_time + ". See <a href='#parameters'>the parameters</a>" +
-                     (typeof mutations_file_contents === 'undefined' ? "." : " and <a href='#mutations'>the mutation settings</a>."));
+        addParagraph("Submitted at " + start_time + ". See <a href='#parameters'>the general settings</a>" +
+                     (typeof mutations_file_contents === 'undefined' ? "." : " or <a href='#mutations'>the mutation settings</a>."));
         addParagraph("<h2>Animation of cells</h2>");
-        addParagraph("Replay time is " + "<span id='canvases-time'>0</span>. To inspect a replicate click on it.", "canvases-caption");
+        // Dimitris suggested removing the following because it was confusing: Replay time is " + "<span id='canvases-time'>0</span>. 
+        addParagraph("To inspect an experimental replicate click on it.", "canvases-caption");
         addDiv('canvases');
-        addParagraph("<h2>Averaged simulations data</h2>");
+        addParagraph("<h2>Averaged simulations results</h2>");
         addDiv('mean-proliferation');
         addDiv('mean-apoptosis');
         addDiv('mean-growth_arrest');
         addDiv('mean-necrosis');
-        addParagraph("<h2>All simulations data</h2>");
+        addParagraph("<h2>All simulations results</h2>");
         addDiv('all-proliferation');
         addDiv('all-apoptosis');
         addDiv('all-growth_arrest');
@@ -575,7 +576,7 @@
 
         var data = [
             {
-                name: "Proliferation Rate",
+                name: "Proliferation Event Count",
                 type: "scatter",
                 mode: "lines",
                 y: proliferation_values
@@ -609,7 +610,7 @@
                 autorange:true,
                 showline:true,
                 linecolor:"rgb(31, 119, 180)",
-                title: "Proliferation Rate",
+                title: "Proliferation Event Count",
                 zeroline: false
             },
             xaxis:{
