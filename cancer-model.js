@@ -397,6 +397,9 @@
     };
     var animate_cells = function (replicate_states, canvases, scale, frame_duration, skip_unchanging_frames, skip_every_n_frames, time_monitor_id, callback) {
         var tick = 1;
+        var mouse_move_listener = function (event) {      	            
+            renderer.render(scene, camera);
+        };
         var display_frame = function () {
             // display 3D the selected replicate -- not the miniatures
             var display_cell = running_3D && replicate_states.length === 1 ? display_cell_3D : display_cell_2D;
@@ -413,6 +416,9 @@
                 var log = replicates[index];
                 var canvas;
                 if (!cells) {
+                	if (running_3D && replicate_states.length === 1) {
+                		renderer.context.canvas.addEventListener('mousemove', mouse_move_listener);
+                	}
                     return; // this replicate is finished
                 }
                 if (running_3D && replicate_states.length === 1) {             
