@@ -315,19 +315,33 @@
 		ambientLight.userData = { keepMe: true };
         scene.add(ambientLight);
 
+        // Rowan suggested the following is better lighting:
+
+          //add light (1)
+        var pointLight1 = new THREE.PointLight(0xffffff);
+        pointLight1.position.set(-400, -400, -400);
+        pointLight1.userData = { keepMe: true };
+        scene.add(pointLight1);
+		
+		//add light (2)
+        var pointLight2 = new THREE.PointLight(0xffffff);
+        pointLight2.position.set(400, 400, 400);
+        pointLight2.userData = { keepMe: true };
+        scene.add(pointLight2);
+
         //add upper spotlight (1)
-        var spotLight1 = new THREE.SpotLight(0xffffff);
-        spotLight1.position.set(-40, 60, -10);
-        spotLight1.castShadow = true;
-		spotLight1.userData = { keepMe: true };
-        scene.add(spotLight1);
+//         var spotLight1 = new THREE.SpotLight(0xffffff);
+//         spotLight1.position.set(-40, 60, -10);
+//         spotLight1.castShadow = true;
+// 		spotLight1.userData = { keepMe: true };
+//         scene.add(spotLight1);
 		
 		//add lower spotlight (2)
-        var spotLight2 = new THREE.SpotLight(0xffffff);
-        spotLight2.position.set(-40, -60, -10);
-        spotLight2.castShadow = true;
-		spotLight2.userData = { keepMe: true };
-        scene.add(spotLight2);
+//         var spotLight2 = new THREE.SpotLight(0xffffff);
+//         spotLight2.position.set(-40, -60, -10);
+//         spotLight2.castShadow = true;
+// 		spotLight2.userData = { keepMe: true };
+//         scene.add(spotLight2);
 
         //add another spotlight (3)
 //         var spotLight3 = new THREE.SpotLight(0xffffff);
