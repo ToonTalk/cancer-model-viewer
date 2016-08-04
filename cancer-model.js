@@ -468,6 +468,54 @@
         display_frame();
     };
 
+    var add_network_graph = function (width, height, font) {
+    	// swap x and y?
+ 	    var options = {width:  width,
+ 	                   height: height,
+ 	                   edges: {arrows: 'to'},
+				       nodes: {color: 'yellow',
+ 	                           font: font || '20px arial'}};
+ 	    var graph_div = document.createElement('div');
+ 	    var initial_y = -500;
+ 	    var input_x = -1000;
+ 	    var output_x = 500;
+ 	    var y = initial_y;
+        var y_increment = 2000/(input_nodes.length+1);
+        var edges, nodes, data, network;
+        input_nodes.forEach(function (node) {
+        	node.color = 'pink';
+        	node.shape = 'box';
+        	node.font = font || '24px arial';
+        	node.physics = false;
+        });
+        output_nodes.forEach(function (node) {
+        	node.color = 'orange';
+        	node.shape = 'box';
+        	node.font = font || '24px arial';
+        	node.physics = false;
+        });
+        nodes = new vis.DataSet(gene_nodes.concat(input_nodes, output_nodes));
+        edges = new vis.DataSet(links_between_nodes);
+        data = {nodes: nodes,
+                edges: edges
+        };
+ 	    graph_div.className = 'network-graph';
+        document.body.appendChild(graph_div);
+        network = new vis.Network(graph_div, data, options);
+        y = initial_y;
+		input_nodes.forEach(function (node) {
+        	y += y_increment;
+        	network.moveNode(node.id, input_x, y);
+        });
+        y = initial_y;
+        y_increment = 2000/(output_nodes.length+1);
+        output_nodes.forEach(function (node) {
+        	y += y_increment;
+        	network.moveNode(node.id, output_x, y);
+        });
+        return graph_div;
+    };
+
     var write_page = function () {
         var addParagraph = function (html, id) {
             var p = document.createElement('p');
@@ -485,8 +533,12 @@
         var parameters_table = "<table class='parameters-table'><tr><th>Parameter</th><th>Value</th></tr>";
         var i;
         addParagraph("<h1>" + replicates.length + " out of " + number_of_replicates_requested + " results from running the cancer model</h1>");
-        addParagraph("Submitted at " + start_time + ". See <a href='#parameters'>the general settings</a>" +
-                     (typeof mutations_file_contents === 'undefined' ? "." : " or <a href='#mutations'>the mutation settings</a>."));
+        addParagraph("Submitted at " + start_time);
+        addParagraph("See <a href='#parameters'>the general settings</a>.");
+        addParagraph("See <a href='#network'>the regulatory network</a>.");
+        if (typeof mutations_file_contents !== 'undefined') {
+        	addParagraph("See <a href='#mutations'>the mutation settings</a>.");
+        }
         addParagraph("<h2>Animation of cells</h2>");
         // Dimitris suggested removing the following because it was confusing: Replay time is " + "<span id='canvases-time'>0</span>. 
         addParagraph("To inspect an experimental replicate click on it.", "canvases-caption");
@@ -501,7 +553,10 @@
         addDiv('all-apoptosis');
         addDiv('all-growth_arrest');
         addDiv('all-necrosis');
-        addParagraph("<h2 >Settings</h2>", 'parameters');
+        addParagraph("<h2>Regulatory Network</h2>", 'network');
+        graph = add_network_graph("1000px", "600px");
+        graph.title = "You can zoom and pan. And drag nodes.";
+        addParagraph("<h2>Settings</h2>", 'parameters');
         for (i = 0; i < parameters.length; i += 2) {
             parameters_table += "<tr><td>" + parameters[i] + "</td><td>" + parameters[i+1] + "</td></tr>";
         }

@@ -20,3 +20,8 @@ body {
     border: 1px solid;
 	padding:   12px;
 }
+
+.vis-network {
+	border: 1px solid lightgray;
+	border-radius: 8px;
+}
