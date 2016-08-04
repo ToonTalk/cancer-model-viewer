@@ -317,7 +317,7 @@
 
         // Rowan suggested the following is better lighting:
 
-          //add light (1)
+        //add light (1)
         var pointLight1 = new THREE.PointLight(0xffffff);
         pointLight1.position.set(-400, -400, -400);
         pointLight1.userData = { keepMe: true };
@@ -328,6 +328,19 @@
         pointLight2.position.set(400, 400, 400);
         pointLight2.userData = { keepMe: true };
         scene.add(pointLight2);
+
+        // more lights added by Ken
+        //add light (3)
+        var pointLight3 = new THREE.PointLight(0xffffff);
+        pointLight3.position.set(-400, 400, -400);
+        pointLight3.userData = { keepMe: true };
+        scene.add(pointLight3);
+		
+		//add light (4)
+        var pointLight4 = new THREE.PointLight(0xffffff);
+        pointLight4.position.set(400, -400, 400);
+        pointLight4.userData = { keepMe: true };
+        scene.add(pointLight4);
 
         //add upper spotlight (1)
 //         var spotLight1 = new THREE.SpotLight(0xffffff);
