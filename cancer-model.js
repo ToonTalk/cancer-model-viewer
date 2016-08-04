@@ -531,14 +531,18 @@
             document.body.appendChild(div);
         };
         var parameters_table = "<table class='parameters-table'><tr><th>Parameter</th><th>Value</th></tr>";
-        var i;
+        var gene_graph, i;
         addParagraph("<h1>" + replicates.length + " out of " + number_of_replicates_requested + " results from running the cancer model</h1>");
         addParagraph("Submitted at " + start_time);
-        addParagraph("See <a href='#parameters'>the general settings</a>.");
-        addParagraph("See <a href='#network'>the regulatory network</a>.");
-        if (typeof mutations_file_contents !== 'undefined') {
-        	addParagraph("See <a href='#mutations'>the mutation settings</a>.");
+        if (typeof parameters !== 'undefined') {
+        	addParagraph("See <a href='#parameters'>the general settings</a>.");
         }
+        if (typeof gene_nodes !== 'undefined') {
+			addParagraph("See <a href='#network'>the regulatory network</a>.");
+        }
+        if (typeof mutations_file_contents !== 'undefined') {
+			addParagraph("See <a href='#mutations'>the mutation settings</a>.");
+	    }
         addParagraph("<h2>Animation of cells</h2>");
         // Dimitris suggested removing the following because it was confusing: Replay time is " + "<span id='canvases-time'>0</span>. 
         addParagraph("To inspect an experimental replicate click on it.", "canvases-caption");
@@ -554,14 +558,18 @@
         addDiv('all-growth_arrest');
         addDiv('all-necrosis');
         addParagraph("<h2>Regulatory Network</h2>", 'network');
-        graph = add_network_graph("1000px", "600px");
-        graph.title = "You can zoom and pan. And drag nodes.";
-        addParagraph("<h2>Settings</h2>", 'parameters');
-        for (i = 0; i < parameters.length; i += 2) {
-            parameters_table += "<tr><td>" + parameters[i] + "</td><td>" + parameters[i+1] + "</td></tr>";
+        if (typeof gene_nodes !== 'undefined') {
+        	gene_graph = add_network_graph("1000px", "600px");
+       	    gene_graph.title = "You can zoom and pan. And drag nodes.";
         }
-        addParagraph(parameters_table + '</table>');
-        if (mutations_file_contents) {
+        if (typeof parameters !== 'undefined') {
+			addParagraph("<h2>Settings</h2>", 'parameters');
+			for (i = 0; i < parameters.length; i += 2) {
+				parameters_table += "<tr><td>" + parameters[i] + "</td><td>" + parameters[i+1] + "</td></tr>";
+			}
+			addParagraph(parameters_table + '</table>');
+        }
+        if (typeof mutations_file_contents !== 'undefined') {
         	addParagraph("<h2>Mutations</h2>", 'mutations');
         	addParagraph(mutations_file_contents);
         }
