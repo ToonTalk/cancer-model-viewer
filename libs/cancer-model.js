@@ -536,7 +536,8 @@
         			node.y = position.y-Math.sin(angle)*correction;
 //                     nodes.add({id: node.id+1000, label: node.label, color: 'red', x: position.x-Math.cos(angle)*correction, y: position.y-Math.sin(angle)*correction, fixed: true, physics: false});
 //         			console.log("Moved " + node.label + " from " + position.x + "," + position.y + " to " + node.x + "," + node.y + " where centre is at " + center.x + "," + center.y);
-        		}        		
+        		}
+        		node.physics = false;       		
         	});
         };
         var x, y, angle, dom_location, edges, nodes, data, network;
