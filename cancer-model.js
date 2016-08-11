@@ -613,7 +613,7 @@
         };
         var parameters_table = "<table class='parameters-table'><tr><th>Parameter</th><th>Value</th></tr>";
         var gene_graph, i;
-        addParagraph("<h1>" + replicates.length + " out of " + number_of_replicates_requested + " results from running microC</h1>");
+        addParagraph("<h1>" + replicates.length + " out of " + number_of_replicates_requested + " results from running the cancer model</h1>");
         addParagraph("Submitted at " + start_time);
         if (typeof parameters !== 'undefined') {
         	addParagraph("See <a href='#parameters'>the general settings</a>.");
@@ -633,7 +633,7 @@
         addDiv('mean-apoptosis');
         addDiv('mean-growth_arrest');
         addDiv('mean-necrosis');
-        addParagraph("<h2>All simulation results</h2>");
+        addParagraph("<h2>All simulations results</h2>");
         addDiv('all-proliferation');
         addDiv('all-apoptosis');
         addDiv('all-growth_arrest');
