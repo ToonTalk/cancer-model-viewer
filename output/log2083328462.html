@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8' />
+<link rel='stylesheet' media='all' href='../libs/cancer-model.css' />
+<link href='../libs/vis/vis.css' rel='stylesheet' type='text/css' />
+<script type='text/javascript' src='../libs/three.js'></script>
+<script type='text/javascript' src='../libs/dat.gui.js'></script>
+<script type='text/javascript' src='../libs/stats.js'></script>
+<script type='text/javascript' src='../libs/OrbitControls.js'></script>
+<script type='text/javascript' src='../libs/rcolor.js'></script>
+<script src='../libs/vis/vis.js'></script>
+<script src='../libs/cancer-model.js'></script>
+<!-- Plotly.js -->
+<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+<title>Results from running cancer simulation</title>
+<script>
+var l = [];
+var s = [];
+var replicates = [];
+var node_changes = [];
+var number_of_replicates_requested = 50; // added manually
+var start_time = '1 Jan 2000 midnight'; // added manually
+var running_3D = true;
+var replicate_counter = 0;
+var minimum_x = Number.MAX_VALUE;
+var maximum_x = Number.MIN_VALUE;
+var minimum_y = Number.MAX_VALUE;
+var maximum_y = Number.MIN_VALUE;
+var parameters,
+    number_of_replicates_requested,
+    mutations_file_contents,
+    gene_nodes,
+    input_nodes,
+    output_nodes,
+    links_between_nodes;
+
+sc({tick: 1, id: 946, on: false, cell: 17, link: 971});
+sc({tick: 1, id: 2517, on: false, cell: 38, link: 2514});
+sc({tick: 1, id: 1237, on: false, cell: 53, link: 1226});
+sc({tick: 1, id: 289, on: false, cell: 24, link: 323});
+sc({tick: 1, id: 2812, on: false, cell: 14, link: 2823});
+sc({tick: 1, id: 2853, on: false, cell: 19, link: 2896});
+sc({tick: 1, id: 2282, on: false, cell: 51, link: 2285});
+sc({tick: 1, id: 1174, on: false, cell: 26, link: 1195});
+sc({tick: 1, id: 483, on: false, cell: 42, link: 464});
+mutations_file_contents = "Percent 1.0<br>EGFR -0.01<br>";
+gene_nodes   = [
+{id: 221, label: "p70"},
+{id: 200, label: "TAK1"},
+{id: 195, label: "ATF2"},
+{id: 185, label: "p53"},
+{id: 194, label: "SMAD"},
+{id: 180, label: "CREB"},
+{id: 225, label: "PI3K"},
+{id: 199, label: "SOS"},
+{id: 223, label: "PLCG"},
+{id: 217, label: "MYC"},
+{id: 177, label: "TAOK"},
+{id: 197, label: "DUSP1"},
+{id: 198, label: "MAX"},
+{id: 216, label: "GAB1"},
+{id: 175, label: "FOS"},
+{id: 196, label: "PTEN"},
+{id: 222, label: "PKC"},
+{id: 212, label: "ERK"},
+{id: 219, label: "RSK"},
+{id: 187, label: "MAP3K1_3"},
+{id: 215, label: "JNK"},
+{id: 210, label: "FOXO3"},
+{id: 206, label: "FGFR3"},
+{id: 204, label: "RAF"},
+{id: 229, label: "FRS2"},
+{id: 190, label: "ATM"},
+{id: 209, label: "p38"},
+{id: 184, label: "AKT"},
+{id: 208, label: "MEK1_2"},
+{id: 181, label: "JUN"},
+{id: 202, label: "AP1"},
+{id: 183, label: "MSK"},
+{id: 203, label: "GRB2"},
+{id: 174, label: "p14"},
+{id: 186, label: "MDM2"},
+{id: 213, label: "SPRY"},
+{id: 191, label: "ELK1"},
+{id: 193, label: "BCL2"},
+{id: 205, label: "HIF1"},
+{id: 230, label: "PDK1"},
+{id: 173, label: "RAS"},
+{id: 214, label: "EGFR"},
+{id: 178, label: "PPP2CA"},
+{id: 227, label: "GADD45"},
+{id: 189, label: "TGFBR"},
+{id: 207, label: "MTK1"},
+{id: 228, label: "p21"}
+];
+input_nodes  = [
+{id: 226, label: "FGFR3_stimulus"},
+{id: 179, label: "TGFBR_stimulus"},
+{id: 224, label: "Oxygen_supply"},
+{id: 218, label: "EGFR_stimulus"},
+{id: 211, label: "DNA_damage"}
+];
+output_nodes = [
+{id: 220, label: "VEGF"},
+{id: 188, label: "EGF"}
+];
+links_between_nodes = [
+{from: 203, to: 229, color: "red"},
+{from: 212, to: 205, color: "green"},
+{from: 173, to: 225, color: "green"},
+{from: 229, to: 203, color: "green"},
+{from: 200, to: 215, color: "green"},
+{from: 212, to: 219, color: "green"},
+{from: 187, to: 209, color: "green"},
+{from: 190, to: 177, color: "green"},
+{from: 198, to: 217, color: "green"},
+{from: 185, to: 227, color: "green"},
+{from: 184, to: 210, color: "red"},
+{from: 226, to: 206, color: "green"},
+{from: 177, to: 209, color: "green"},
+{from: 205, to: 220, color: "green"},
+{from: 227, to: 207, color: "green"},
+{from: 189, to: 203, color: "green"},
+{from: 224, to: 205, color: "green"},
+{from: 215, to: 191, color: "green"},
+{from: 209, to: 178, color: "green"},
+{from: 206, to: 229, color: "green"},
+{from: 216, to: 225, color: "green"},
+{from: 213, to: 229, color: "red"},
+{from: 185, to: 196, color: "green"},
+{from: 173, to: 187, color: "green"},
+{from: 214, to: 223, color: "green"},
+{from: 212, to: 175, color: "green"},
+{from: 218, to: 214, color: "green"},
+{from: 230, to: 184, color: "green"},
+{from: 222, to: 206, color: "red"},
+{from: 181, to: 202, color: "green"},
+{from: 203, to: 206, color: "red"},
+{from: 212, to: 191, color: "green"},
+{from: 203, to: 216, color: "green"},
+{from: 217, to: 201, color: "green"},
+{from: 174, to: 186, color: "red"},
+{from: 185, to: 176, color: "green"},
+{from: 219, to: 199, color: "red"},
+{from: 221, to: 205, color: "green"},
+{from: 184, to: 228, color: "red"},
+{from: 209, to: 185, color: "green"},
+{from: 183, to: 217, color: "green"},
+{from: 197, to: 209, color: "red"},
+{from: 209, to: 183, color: "green"},
+{from: 215, to: 195, color: "green"},
+{from: 212, to: 176, color: "red"},
+{from: 213, to: 214, color: "green"},
+{from: 217, to: 174, color: "green"},
+{from: 184, to: 186, color: "green"},
+{from: 180, to: 175, color: "green"},
+{from: 186, to: 185, color: "red"},
+{from: 224, to: 182, color: "red"},
+{from: 184, to: 221, color: "green"},
+{from: 173, to: 204, color: "green"},
+{from: 197, to: 215, color: "red"},
+{from: 185, to: 186, color: "green"},
+{from: 199, to: 225, color: "green"},
+{from: 211, to: 190, color: "green"},
+{from: 208, to: 212, color: "green"},
+{from: 215, to: 181, color: "green"},
+{from: 199, to: 173, color: "green"},
+{from: 180, to: 197, color: "green"},
+{from: 223, to: 173, color: "green"},
+{from: 207, to: 215, color: "green"},
+{from: 212, to: 213, color: "green"},
+{from: 221, to: 201, color: "green"},
+{from: 210, to: 176, color: "green"},
+{from: 200, to: 209, color: "green"},
+{from: 189, to: 200, color: "green"},
+{from: 209, to: 191, color: "green"},
+{from: 184, to: 193, color: "green"},
+{from: 189, to: 194, color: "green"},
+{from: 179, to: 189, color: "green"},
+{from: 180, to: 193, color: "green"},
+{from: 207, to: 209, color: "green"},
+{from: 214, to: 203, color: "green"},
+{from: 225, to: 216, color: "green"},
+{from: 223, to: 222, color: "green"},
+{from: 187, to: 215, color: "green"},
+{from: 196, to: 184, color: "red"},
+{from: 225, to: 230, color: "green"},
+{from: 184, to: 204, color: "red"},
+{from: 184, to: 217, color: "green"},
+{from: 212, to: 221, color: "green"},
+{from: 193, to: 176, color: "red"},
+{from: 177, to: 215, color: "green"},
+{from: 187, to: 208, color: "green"},
+{from: 185, to: 228, color: "green"},
+{from: 212, to: 183, color: "green"},
+{from: 178, to: 208, color: "red"},
+{from: 219, to: 175, color: "green"},
+{from: 191, to: 175, color: "green"},
+{from: 175, to: 202, color: "green"},
+{from: 206, to: 223, color: "green"},
+{from: 215, to: 210, color: "green"},
+{from: 205, to: 188, color: "green"},
+{from: 183, to: 180, color: "green"},
+{from: 203, to: 199, color: "green"},
+{from: 209, to: 195, color: "green"},
+{from: 222, to: 214, color: "red"},
+{from: 212, to: 204, color: "red"},
+{from: 190, to: 185, color: "green"},
+{from: 230, to: 221, color: "green"},
+{from: 222, to: 204, color: "green"},
+{from: 228, to: 192, color: "green"},
+{from: 194, to: 227, color: "green"},
+{from: 195, to: 202, color: "green"},
+{from: 202, to: 208, color: "red"},
+{from: 209, to: 198, color: "green"},
+{from: 228, to: 201, color: "red"},
+{from: 203, to: 214, color: "red"},
+{from: 204, to: 208, color: "green"}
+];
+sc({tick: 1, id: 1352, on: false, cell: 36, link: 1365});
+sc({tick: 1, id: 2429, on: false, cell: 9, link: 2409});
+sc({tick: 1, id: 1088, on: false, cell: 49, link: 1079});
+sc({tick: 1, id: 168, on: false, cell: 15, link: 141});
+sc({tick: 1, id: 1681, on: false, cell: 29, link: 1725});
+sc({tick: 1, id: 286, on: false, cell: 16, link: 288});
+sc({tick: 1, id: 1765, on: false, cell: 13, link: 1752});
+sc({tick: 1, id: 110, on: false, cell: 18, link: 113});
+sc({tick: 1, id: 2602, on: false, cell: 6, link: 2553});
+sc({tick: 1, id: 876, on: false, cell: 44, link: 911});
+sc({tick: 1, id: 2325, on: false, cell: 45, link: 2373});
+sc({tick: 1, id: 1897, on: false, cell: 39, link: 1871});
+sc({tick: 1, id: 2101, on: false, cell: 25, link: 2109});
+l[1]=
+[{added: 19},
+{added: 47},
+{added: 9},
+{added: 45},
+{added: 38},
+{added: 13},
+{added: 21},
+{added: 17},
+{added: 43},
+{added: 33},
+{added: 42},
+{added: 34},
+{added: 35},
+{added: 20},
+{added: 46},
+{added: 24},
+{added: 53},
+{added: 51},
+{added: 48},
+{added: 23},
+{added: 29},
+{added: 27},
+{added: 5},
+{added: 30},
+{added: 6},
+{added: 8},
+{added: 16},
+{added: 12},
+{added: 28},
+{added: 44},
+{added: 15},
+{added: 39},
+{added: 31},
+{added: 25},
+{added: 40},
+{added: 18},
+{added: 14},
+{added: 4},
+{added: 32},
+{added: 50},
+{added: 37},
+{added: 52},
+{added: 49},
+{added: 10},
+{added: 41},
+{added: 22},
+{added: 11},
+{added: 26},
+{added: 36},
+{added: 7},
+{x: 1, y: -1, z: 1, who: 43},
+{x: 1, y: 0, z: 1, who: 51},
+{x: 2, y: -1, z: 1, who: 7},
+{x: 0, y: 1, z: 0, who: 49},
+{x: -2, y: 2, z: 0, who: 53},
+{x: -1, y: 0, z: 1, who: 33},
+{x: 2, y: -2, z: 1, who: 13},
+{x: -1, y: 0, z: 0, who: 30},
+{x: 0, y: 0, z: 0, who: 46},
+{x: -2, y: -2, z: 1, who: 12},
+{x: 2, y: 2, z: 0, who: 21},
+{x: -2, y: 1, z: 1, who: 9},
+{x: 2, y: 1, z: 1, who: 48},
+{x: -1, y: 1, z: 0, who: 10},
+{x: -2, y: -1, z: 1, who: 4},
+{x: 2, y: 0, z: 0, who: 44},
+{x: 0, y: -1, z: 1, who: 35},
+{x: 2, y: 1, z: 0, who: 26},
+{x: -1, y: -2, z: 1, who: 28},
+{x: 0, y: -2, z: 0, who: 22},
+{x: -1, y: 2, z: 1, who: 50},
+{x: -2, y: 0, z: 0, who: 34},
+{x: -1, y: -2, z: 0, who: 15},
+{x: 0, y: -2, z: 1, who: 23},
+{x: -1, y: 2, z: 0, who: 37},
+{x: 0, y: 2, z: 0, who: 36},
+{x: -2, y: 0, z: 1, who: 25},
+{x: 0, y: 2, z: 1, who: 14},
+{x: -2, y: 1, z: 0, who: 17},
+{x: 1, y: -1, z: 0, who: 20},
+{x: 2, y: 0, z: 1, who: 45},
+{x: -2, y: 2, z: 1, who: 11},
+{x: -1, y: 1, z: 1, who: 5},
+{x: 1, y: 2, z: 0, who: 8},
+{x: 0, y: 0, z: 1, who: 32},
+{x: 1, y: 2, z: 1, who: 19},
+{x: 2, y: 2, z: 1, who: 40},
+{x: -1, y: -1, z: 1, who: 39},
+{x: -2, y: -2, z: 0, who: 18},
+{x: 2, y: -2, z: 0, who: 24},
+{x: 1, y: -2, z: 1, who: 29},
+{x: 0, y: -1, z: 0, who: 42},
+{x: 1, y: -2, z: 0, who: 16},
+{x: 1, y: 1, z: 1, who: 6},
+{x: 1, y: 1, z: 0, who: 47},
+{x: -1, y: -1, z: 0, who: 31},
+{x: -2, y: -1, z: 0, who: 41},
+{x: 2, y: -1, z: 0, who: 52},
+{x: 1, y: 0, z: 0, who: 27},
+{x: 0, y: 1, z: 1, who: 38}];
+sc({tick: 2, id: 2717, on: true, cell: 11, link: 2711});
+sc({tick: 2, id: 337, on: false, cell: 24, link: 289});
+sc({tick: 2, id: 2048, on: true, cell: 7, link: 2069});
+sc({tick: 2, id: 1568, on: false, cell: 28, link: 1600});
+sc({tick: 2, id: 713, on: true, cell: 30, link: 752});
+sc({tick: 2, id: 1149, on: true, cell: 47, link: 1131});
+sc({tick: 2, id: 811, on: false, cell: 27, link: 817});
+sc({tick: 2, id: 1508, on: false, cell: 12, link: 1553});
+sc({tick: 2, id: 498, on: false, cell: 42, link: 483});
+sc({tick: 2, id: 2505, on: false, cell: 38, link: 2517});
+sc({tick: 2, id: 2015, on: false, cell: 43, link: 2014});
+sc({tick: 2, id: 2953, on: false, cell: 40, link: 2933});
+sc({tick: 2, id: 1423, on: false, cell: 8, link: 1413});
+sc({tick: 2, id: 1084, on: true, cell: 49, link: 1088});
+sc({tick: 2, id: 2360, on: false, cell: 45, link: 2325});
+sc({tick: 2, id: 234, on: false, cell: 16, link: 286});
+sc({tick: 2, id: 382, on: false, cell: 41, link: 361});
+sc({tick: 2, id: 554, on: false, cell: 20, link: 523});
+sc({tick: 2, id: 2827, on: true, cell: 14, link: 2812});
+sc({tick: 2, id: 1721, on: false, cell: 29, link: 1681});
+sc({tick: 2, id: 2183, on: false, cell: 33, link: 2194});
+sc({tick: 2, id: 2610, on: false, cell: 48, link: 2644});
+sc({tick: 4, id: 1584, on: false, cell: 28, link: 1568});
+sc({tick: 4, id: 1790, on: true, cell: 13, link: 1778});
+sc({tick: 4, id: 1665, on: false, cell: 23, link: 1648});
+sc({tick: 4, id: 2088, on: false, cell: 25, link: 2089});
+sc({tick: 4, id: 1925, on: false, cell: 35, link: 1917});
+sc({tick: 4, id: 608, on: false, cell: 52, link: 625});
+sc({tick: 4, id: 242, on: true, cell: 16, link: 234});
+sc({tick: 4, id: 2869, on: true, cell: 19, link: 2859});
+sc({tick: 4, id: 73, on: false, cell: 18, link: 67});
+sc({tick: 4, id: 2910, on: true, cell: 40, link: 2953});
+sc({tick: 4, id: 1016, on: false, cell: 10, link: 999});
+sc({tick: 4, id: 2593, on: true, cell: 6, link: 2598});
+sc({tick: 4, id: 1261, on: true, cell: 53, link: 1247});
+sc({tick: 4, id: 143, on: true, cell: 15, link: 119});
+sc({tick: 4, id: 495, on: true, cell: 42, link: 498});
+sc({tick: 4, id: 2684, on: true, cell: 11, link: 2717});
+sc({tick: 4, id: 1282, on: false, cell: 37, link: 1307});
+sc({tick: 4, id: 2216, on: true, cell: 32, link: 2218});
+sc({tick: 4, id: 1069, on: true, cell: 49, link: 1084});
+sc({tick: 4, id: 1159, on: false, cell: 26, link: 1190});
+sc({tick: 4, id: 1732, on: true, cell: 29, link: 1721});
+sc({tick: 4, id: 2168, on: false, cell: 33, link: 2183});
+sc({tick: 4, id: 1905, on: true, cell: 39, link: 1890});
+sc({tick: 4, id: 1822, on: true, cell: 4, link: 1843});
+sc({tick: 4, id: 365, on: false, cell: 41, link: 382});
+sc({tick: 4, id: 2265, on: true, cell: 51, link: 2275});
+sc({tick: 4, id: 771, on: false, cell: 46, link: 783});
+sc({tick: 6, id: 2152, on: false, cell: 33, link: 2168});
+sc({tick: 6, id: 2747, on: true, cell: 50, link: 2742});
+sc({tick: 6, id: 2260, on: false, cell: 32, link: 2216});
+sc({tick: 6, id: 1997, on: true, cell: 43, link: 2023});
+sc({tick: 6, id: 1419, on: true, cell: 8, link: 1396});
+sc({tick: 6, id: 2525, on: true, cell: 38, link: 2539});
+sc({tick: 6, id: 1227, on: false, cell: 53, link: 1261});
+sc({tick: 6, id: 447, on: true, cell: 31, link: 412});
+sc({tick: 6, id: 195, on: true, cell: 22, link: 209});
+sc({tick: 6, id: 2275, on: false, cell: 51, link: 2265});
+sc({tick: 6, id: 2673, on: false, cell: 11, link: 2684});
+sc({tick: 6, id: 1503, on: true, cell: 21, link: 1491});
+sc({tick: 6, id: 1514, on: true, cell: 12, link: 1509});
+sc({tick: 6, id: 376, on: true, cell: 41, link: 365});
+sc({tick: 6, id: 81, on: true, cell: 18, link: 73});
+sc({tick: 6, id: 1182, on: false, cell: 26, link: 1159});
+sc({tick: 6, id: 250, on: true, cell: 16, link: 242});
+sc({tick: 6, id: 1701, on: true, cell: 29, link: 1732});
+sc({tick: 6, id: 2793, on: false, cell: 14, link: 2820});
+sc({tick: 6, id: 2089, on: false, cell: 25, link: 2088});
+sc({tick: 6, id: 695, on: false, cell: 30, link: 709});
+sc({tick: 8, id: 85, on: false, cell: 18, link: 81});
+sc({tick: 8, id: 343, on: false, cell: 24, link: 313});
+sc({tick: 8, id: 513, on: false, cell: 42, link: 492});
+sc({tick: 8, id: 1060, on: true, cell: 49, link: 1093});
+sc({tick: 8, id: 1590, on: false, cell: 28, link: 1586});
+sc({tick: 8, id: 1516, on: true, cell: 12, link: 1514});
+sc({tick: 8, id: 1401, on: true, cell: 8, link: 1419});
+sc({tick: 8, id: 2827, on: false, cell: 14, link: 2793});
+sc({tick: 8, id: 1738, on: false, cell: 29, link: 1701});
+sc({tick: 8, id: 1783, on: true, cell: 13, link: 1747});
+sc({tick: 8, id: 2364, on: true, cell: 45, link: 2338});
+sc({tick: 8, id: 274, on: true, cell: 16, link: 250});
+sc({tick: 8, id: 1994, on: false, cell: 43, link: 1997});
+sc({tick: 8, id: 2101, on: true, cell: 25, link: 2089});
+sc({tick: 8, id: 1832, on: false, cell: 4, link: 1828});
+sc({tick: 8, id: 2905, on: true, cell: 40, link: 2900});
+sc({tick: 8, id: 681, on: false, cell: 34, link: 680});
+sc({tick: 10, id: 1566, on: false, cell: 28, link: 1590});
+sc({tick: 10, id: 1726, on: false, cell: 29, link: 1738});
+sc({tick: 10, id: 650, on: false, cell: 34, link: 681});
+sc({tick: 10, id: 1542, on: true, cell: 12, link: 1516});
+sc({tick: 10, id: 1451, on: false, cell: 21, link: 1470});
+sc({tick: 10, id: 2651, on: true, cell: 48, link: 2665});
+sc({tick: 10, id: 1359, on: false, cell: 36, link: 1367});
+sc({tick: 10, id: 2100, on: true, cell: 25, link: 2101});
+sc({tick: 10, id: 208, on: false, cell: 22, link: 202});
+sc({tick: 10, id: 83, on: false, cell: 18, link: 85});
+sc({tick: 10, id: 1973, on: true, cell: 43, link: 1994});
+sc({tick: 10, id: 408, on: true, cell: 31, link: 411});
+sc({tick: 10, id: 2357, on: true, cell: 45, link: 2364});
+sc({tick: 10, id: 2482, on: false, cell: 5, link: 2481});
+sc({tick: 10, id: 2432, on: true, cell: 9, link: 2431});
+sc({tick: 10, id: 2788, on: true, cell: 14, link: 2827});
+sc({tick: 10, id: 2890, on: false, cell: 19, link: 2863});
+sc({tick: 10, id: 756, on: true, cell: 46, link: 765});
+sc({tick: 10, id: 1290, on: true, cell: 37, link: 1308});
+sc({tick: 10, id: 2737, on: true, cell: 50, link: 2771});
+sc({tick: 10, id: 520, on: false, cell: 42, link: 513});
+sc({tick: 10, id: 2493, on: false, cell: 38, link: 2533});
+sc({tick: 12, id: 1202, on: false, cell: 26, link: 1200});
+sc({tick: 12, id: 606, on: false, cell: 52, link: 598});
+sc({tick: 12, id: 2384, on: true, cell: 9, link: 2432});
+sc({tick: 12, id: 1064, on: true, cell: 49, link: 1071});
+sc({tick: 12, id: 2369, on: false, cell: 45, link: 2357});
+sc({tick: 12, id: 766, on: false, cell: 46, link: 756});
+sc({tick: 12, id: 722, on: false, cell: 30, link: 730});
+sc({tick: 12, id: 1284, on: false, cell: 37, link: 1290});
+sc({tick: 12, id: 2510, on: false, cell: 38, link: 2493});
+sc({tick: 12, id: 1398, on: false, cell: 8, link: 1448});
+sc({tick: 12, id: 387, on: false, cell: 41, link: 384});
+sc({tick: 12, id: 2182, on: false, cell: 33, link: 2163});
+sc({tick: 12, id: 1112, on: true, cell: 47, link: 1120});
+sc({tick: 12, id: 663, on: false, cell: 34, link: 650});
+sc({tick: 12, id: 2640, on: true, cell: 48, link: 2651});
+sc({tick: 12, id: 2114, on: true, cell: 25, link: 2100});
+sc({tick: 12, id: 1758, on: true, cell: 13, link: 1743});
+sc({tick: 12, id: 1257, on: true, cell: 53, link: 1265});
+sc({tick: 12, id: 2228, on: false, cell: 32, link: 2204});
+sc({tick: 12, id: 1659, on: false, cell: 23, link: 1651});
+sc({tick: 12, id: 1798, on: false, cell: 4, link: 1847});
+sc({tick: 12, id: 2039, on: true, cell: 7, link: 2038});
+sc({tick: 12, id: 2764, on: true, cell: 50, link: 2737});
+sc({tick: 12, id: 1462, on: false, cell: 21, link: 1451});
+sc({tick: 12, id: 987, on: false, cell: 10, link: 1012});
+l[12]=
+[{removed: 13}];
+s[12]=
+{apoptosis: 1};
+sc({tick: 14, id: 1921, on: false, cell: 35, link: 1932});
+sc({tick: 14, id: 2216, on: false, cell: 32, link: 2228});
+sc({tick: 14, id: 579, on: false, cell: 52, link: 606});
+sc({tick: 14, id: 1608, on: false, cell: 28, link: 1578});
+sc({tick: 14, id: 319, on: false, cell: 24, link: 294});
+sc({tick: 14, id: 221, on: false, cell: 22, link: 212});
+sc({tick: 14, id: 2873, on: true, cell: 19, link: 2856});
+sc({tick: 14, id: 424, on: true, cell: 31, link: 439});
+sc({tick: 14, id: 1251, on: false, cell: 53, link: 1257});
+sc({tick: 14, id: 2783, on: true, cell: 14, link: 2821});
+sc({tick: 14, id: 2425, on: false, cell: 9, link: 2384});
+sc({tick: 14, id: 1068, on: true, cell: 49, link: 1064});
+sc({tick: 14, id: 2595, on: false, cell: 6, link: 2602});
+sc({tick: 14, id: 287, on: true, cell: 16, link: 247});
+sc({tick: 14, id: 1201, on: false, cell: 26, link: 1202});
+sc({tick: 14, id: 2750, on: false, cell: 50, link: 2764});
+sc({tick: 14, id: 1430, on: false, cell: 8, link: 1398});
+sc({tick: 14, id: 804, on: true, cell: 46, link: 766});
+sc({tick: 16, id: 2852, on: false, cell: 19, link: 2873});
+sc({tick: 16, id: 444, on: true, cell: 31, link: 424});
+sc({tick: 16, id: 2554, on: true, cell: 6, link: 2595});
+sc({tick: 16, id: 2382, on: false, cell: 9, link: 2425});
+sc({tick: 16, id: 628, on: false, cell: 52, link: 579});
+sc({tick: 16, id: 1110, on: false, cell: 47, link: 1135});
+sc({tick: 16, id: 1426, on: false, cell: 8, link: 1430});
+sc({tick: 16, id: 668, on: false, cell: 34, link: 686});
+sc({tick: 16, id: 2707, on: false, cell: 11, link: 2673});
+sc({tick: 16, id: 2321, on: true, cell: 45, link: 2354});
+sc({tick: 16, id: 767, on: true, cell: 46, link: 804});
+sc({tick: 16, id: 1021, on: false, cell: 10, link: 1035});
+sc({tick: 16, id: 2491, on: true, cell: 5, link: 2457});
+sc({tick: 16, id: 1947, on: false, cell: 35, link: 1921});
+sc({tick: 16, id: 1069, on: false, cell: 49, link: 1068});
+sc({tick: 16, id: 293, on: true, cell: 24, link: 319});
+sc({tick: 16, id: 1291, on: false, cell: 37, link: 1329});
+sc({tick: 16, id: 726, on: false, cell: 30, link: 750});
+sc({tick: 16, id: 2003, on: false, cell: 43, link: 2009});
+sc({tick: 18, id: 962, on: true, cell: 17, link: 953});
+sc({tick: 18, id: 2277, on: false, cell: 51, link: 2282});
+sc({tick: 18, id: 1625, on: false, cell: 23, link: 1627});
+sc({tick: 18, id: 2455, on: true, cell: 5, link: 2491});
+sc({tick: 18, id: 712, on: true, cell: 30, link: 726});
+sc({tick: 18, id: 2147, on: true, cell: 33, link: 2186});
+sc({tick: 18, id: 64, on: false, cell: 18, link: 110});
+sc({tick: 18, id: 190, on: false, cell: 22, link: 211});
+sc({tick: 18, id: 2123, on: true, cell: 25, link: 2099});
+sc({tick: 18, id: 2775, on: false, cell: 50, link: 2772});
+sc({tick: 18, id: 1152, on: false, cell: 47, link: 1110});
+sc({tick: 18, id: 2239, on: false, cell: 32, link: 2204});
+sc({tick: 18, id: 2418, on: false, cell: 9, link: 2382});
+sc({tick: 18, id: 370, on: false, cell: 41, link: 354});
+sc({tick: 18, id: 2674, on: false, cell: 11, link: 2707});
+sc({tick: 18, id: 1962, on: true, cell: 35, link: 1947});
+sc({tick: 18, id: 2016, on: false, cell: 43, link: 2003});
+sc({tick: 20, id: 553, on: true, cell: 20, link: 564});
+sc({tick: 20, id: 2912, on: true, cell: 40, link: 2937});
+sc({tick: 20, id: 943, on: true, cell: 17, link: 962});
+sc({tick: 20, id: 2789, on: false, cell: 14, link: 2822});
+sc({tick: 20, id: 1670, on: false, cell: 23, link: 1625});
+sc({tick: 20, id: 669, on: false, cell: 34, link: 658});
+sc({tick: 20, id: 1415, on: false, cell: 8, link: 1411});
+sc({tick: 20, id: 1591, on: false, cell: 28, link: 1621});
+sc({tick: 20, id: 904, on: true, cell: 44, link: 913});
+sc({tick: 20, id: 2875, on: false, cell: 19, link: 2851});
+sc({tick: 20, id: 2211, on: false, cell: 32, link: 2239});
+sc({tick: 20, id: 1053, on: true, cell: 49, link: 1075});
+sc({tick: 20, id: 2142, on: false, cell: 25, link: 2123});
+sc({tick: 20, id: 2423, on: false, cell: 9, link: 2418});
+sc({tick: 20, id: 696, on: false, cell: 30, link: 712});
+sc({tick: 20, id: 1947, on: true, cell: 35, link: 1962});
+sc({tick: 20, id: 177, on: false, cell: 22, link: 190});
+sc({tick: 20, id: 1510, on: false, cell: 12, link: 1532});
+sc({tick: 22, id: 1211, on: false, cell: 26, link: 1162});
+sc({tick: 22, id: 2260, on: true, cell: 32, link: 2211});
+sc({tick: 22, id: 1689, on: false, cell: 29, link: 1736});
+sc({tick: 22, id: 2274, on: false, cell: 51, link: 2263});
+sc({tick: 22, id: 2566, on: false, cell: 6, link: 2554});
+sc({tick: 22, id: 1535, on: false, cell: 12, link: 1510});
+sc({tick: 22, id: 2146, on: true, cell: 33, link: 2190});
+sc({tick: 22, id: 1158, on: false, cell: 47, link: 1126});
+sc({tick: 22, id: 2805, on: true, cell: 14, link: 2789});
+sc({tick: 22, id: 530, on: true, cell: 20, link: 553});
+sc({tick: 22, id: 2467, on: false, cell: 5, link: 2437});
+sc({tick: 22, id: 1430, on: true, cell: 8, link: 1415});
+sc({tick: 22, id: 712, on: false, cell: 30, link: 696});
+sc({tick: 22, id: 2323, on: false, cell: 45, link: 2341});
+sc({tick: 22, id: 1860, on: false, cell: 39, link: 1870});
+sc({tick: 22, id: 981, on: false, cell: 17, link: 943});
+sc({tick: 24, id: 1521, on: false, cell: 12, link: 1535});
+sc({tick: 24, id: 2865, on: true, cell: 19, link: 2888});
+sc({tick: 24, id: 1177, on: true, cell: 26, link: 1211});
+sc({tick: 24, id: 2239, on: true, cell: 32, link: 2260});
+sc({tick: 24, id: 2700, on: false, cell: 11, link: 2668});
+sc({tick: 24, id: 2058, on: true, cell: 7, link: 2041});
+sc({tick: 24, id: 2792, on: false, cell: 14, link: 2805});
+sc({tick: 24, id: 69, on: false, cell: 18, link: 67});
+sc({tick: 24, id: 1130, on: false, cell: 47, link: 1158});
+sc({tick: 24, id: 1581, on: true, cell: 28, link: 1603});
+sc({tick: 24, id: 237, on: false, cell: 16, link: 247});
+sc({tick: 24, id: 2544, on: true, cell: 38, link: 2545});
+sc({tick: 24, id: 1684, on: false, cell: 29, link: 1689});
+sc({tick: 24, id: 1280, on: false, cell: 37, link: 1329});
+sc({tick: 24, id: 1495, on: false, cell: 21, link: 1501});
+sc({tick: 24, id: 2598, on: false, cell: 6, link: 2566});
+sc({tick: 24, id: 836, on: false, cell: 27, link: 828});
+sc({tick: 24, id: 1426, on: true, cell: 8, link: 1430});
+sc({tick: 26, id: 667, on: true, cell: 34, link: 686});
+sc({tick: 26, id: 957, on: false, cell: 17, link: 936});
+sc({tick: 26, id: 2724, on: false, cell: 11, link: 2700});
+sc({tick: 26, id: 2307, on: false, cell: 51, link: 2303});
+sc({tick: 26, id: 1272, on: true, cell: 53, link: 1256});
+sc({tick: 26, id: 1551, on: true, cell: 12, link: 1521});
+sc({tick: 26, id: 1041, on: false, cell: 10, link: 1014});
+sc({tick: 26, id: 2211, on: true, cell: 32, link: 2239});
+sc({tick: 26, id: 117, on: false, cell: 15, link: 171});
+sc({tick: 26, id: 2778, on: true, cell: 50, link: 2742});
+sc({tick: 26, id: 1394, on: true, cell: 8, link: 1426});
+sc({tick: 26, id: 856, on: false, cell: 27, link: 836});
+sc({tick: 26, id: 1693, on: false, cell: 29, link: 1684});
+sc({tick: 26, id: 1500, on: false, cell: 21, link: 1495});
+sc({tick: 26, id: 2578, on: false, cell: 6, link: 2598});
+l[26]=
+[{removed: 34}];
+s[26]=
+{apoptosis: 2};
+sc({tick: 28, id: 2799, on: false, cell: 14, link: 2796});
+sc({tick: 28, id: 786, on: false, cell: 46, link: 761});
+sc({tick: 28, id: 1343, on: false, cell: 36, link: 1366});
+sc({tick: 28, id: 462, on: true, cell: 31, link: 408});
+sc({tick: 28, id: 1671, on: false, cell: 23, link: 1654});
+sc({tick: 28, id: 2405, on: false, cell: 9, link: 2392});
+sc({tick: 28, id: 2475, on: false, cell: 5, link: 2482});
+sc({tick: 28, id: 1436, on: false, cell: 8, link: 1394});
+sc({tick: 28, id: 159, on: false, cell: 15, link: 117});
+sc({tick: 28, id: 2754, on: true, cell: 50, link: 2778});
+sc({tick: 28, id: 2055, on: true, cell: 7, link: 2045});
+sc({tick: 28, id: 1113, on: true, cell: 47, link: 1138});
+sc({tick: 28, id: 541, on: false, cell: 20, link: 573});
+sc({tick: 28, id: 2162, on: false, cell: 33, link: 2157});
+sc({tick: 28, id: 2604, on: false, cell: 6, link: 2578});
+sc({tick: 28, id: 2703, on: true, cell: 11, link: 2724});
+sc({tick: 28, id: 76, on: false, cell: 18, link: 86});
+sc({tick: 28, id: 1576, on: false, cell: 28, link: 1620});
+sc({tick: 30, id: 961, on: true, cell: 17, link: 982});
+sc({tick: 30, id: 1613, on: false, cell: 28, link: 1576});
+sc({tick: 30, id: 2899, on: false, cell: 40, link: 2914});
+sc({tick: 30, id: 1550, on: true, cell: 12, link: 1523});
+sc({tick: 30, id: 1487, on: false, cell: 21, link: 1497});
+sc({tick: 30, id: 995, on: false, cell: 10, link: 1004});
+sc({tick: 30, id: 1245, on: false, cell: 53, link: 1268});
+sc({tick: 30, id: 1065, on: false, cell: 49, link: 1062});
+sc({tick: 30, id: 2580, on: false, cell: 6, link: 2604});
+sc({tick: 30, id: 2855, on: true, cell: 19, link: 2875});
+sc({tick: 30, id: 1129, on: false, cell: 47, link: 1113});
+sc({tick: 30, id: 1914, on: false, cell: 35, link: 1951});
+sc({tick: 30, id: 2181, on: false, cell: 33, link: 2162});
+sc({tick: 30, id: 2101, on: false, cell: 25, link: 2109});
+sc({tick: 30, id: 2456, on: true, cell: 5, link: 2475});
+sc({tick: 30, id: 753, on: false, cell: 46, link: 786});
+sc({tick: 30, id: 2273, on: false, cell: 51, link: 2272});
+sc({tick: 32, id: 2031, on: false, cell: 7, link: 2066});
+sc({tick: 32, id: 872, on: true, cell: 44, link: 875});
+sc({tick: 32, id: 780, on: true, cell: 46, link: 753});
+sc({tick: 32, id: 1578, on: true, cell: 28, link: 1613});
+sc({tick: 32, id: 1386, on: true, cell: 36, link: 1337});
+sc({tick: 32, id: 2686, on: true, cell: 11, link: 2688});
+sc({tick: 32, id: 2166, on: false, cell: 33, link: 2181});
+sc({tick: 32, id: 2295, on: false, cell: 51, link: 2273});
+sc({tick: 32, id: 1470, on: false, cell: 21, link: 1487});
+sc({tick: 32, id: 813, on: false, cell: 27, link: 834});
+sc({tick: 32, id: 2100, on: false, cell: 25, link: 2101});
+sc({tick: 32, id: 96, on: true, cell: 18, link: 92});
+sc({tick: 32, id: 2226, on: false, cell: 32, link: 2253});
+sc({tick: 32, id: 2947, on: false, cell: 40, link: 2899});
+sc({tick: 32, id: 2475, on: true, cell: 5, link: 2456});
+l[32]=
+[{removed: 36}];
+s[32]=
+{apoptosis: 3};
+sc({tick: 34, id: 1121, on: false, cell: 47, link: 1137});
+sc({tick: 34, id: 2078, on: false, cell: 7, link: 2031});
+sc({tick: 34, id: 1697, on: true, cell: 29, link: 1683});
+sc({tick: 34, id: 2601, on: false, cell: 6, link: 2567});
+sc({tick: 34, id: 856, on: true, cell: 27, link: 813});
+sc({tick: 34, id: 802, on: true, cell: 46, link: 780});
+sc({tick: 34, id: 254, on: true, cell: 16, link: 266});
+sc({tick: 34, id: 569, on: true, cell: 20, link: 566});
+sc({tick: 34, id: 2698, on: false, cell: 11, link: 2686});
+sc({tick: 34, id: 2114, on: false, cell: 25, link: 2100});
+sc({tick: 34, id: 910, on: false, cell: 44, link: 872});
+sc({tick: 34, id: 336, on: true, cell: 24, link: 333});
+sc({tick: 34, id: 65, on: true, cell: 18, link: 96});
+sc({tick: 34, id: 1608, on: true, cell: 28, link: 1578});
+sc({tick: 34, id: 2313, on: true, cell: 51, link: 2295});
+sc({tick: 34, id: 434, on: true, cell: 31, link: 462});
+sc({tick: 34, id: 2813, on: false, cell: 14, link: 2804});
+sc({tick: 36, id: 2945, on: false, cell: 40, link: 2902});
+sc({tick: 36, id: 1572, on: true, cell: 28, link: 1608});
+sc({tick: 36, id: 790, on: false, cell: 46, link: 802});
+sc({tick: 36, id: 213, on: false, cell: 22, link: 212});
+sc({tick: 36, id: 442, on: true, cell: 31, link: 434});
+sc({tick: 36, id: 2379, on: false, cell: 9, link: 2410});
+sc({tick: 36, id: 2276, on: true, cell: 51, link: 2313});
+sc({tick: 36, id: 551, on: true, cell: 20, link: 569});
+sc({tick: 36, id: 2817, on: true, cell: 14, link: 2813});
+sc({tick: 36, id: 312, on: true, cell: 24, link: 336});
+sc({tick: 36, id: 1431, on: true, cell: 8, link: 1435});
+sc({tick: 36, id: 1716, on: false, cell: 29, link: 1697});
+sc({tick: 36, id: 500, on: false, cell: 42, link: 515});
+sc({tick: 36, id: 2203, on: false, cell: 32, link: 2248});
+sc({tick: 36, id: 2050, on: true, cell: 7, link: 2078});
+sc({tick: 36, id: 819, on: true, cell: 27, link: 856});
+sc({tick: 36, id: 2101, on: true, cell: 25, link: 2114});
+sc({tick: 38, id: 321, on: false, cell: 24, link: 312});
+sc({tick: 38, id: 229, on: false, cell: 22, link: 213});
+sc({tick: 38, id: 476, on: true, cell: 42, link: 500});
+sc({tick: 38, id: 569, on: false, cell: 20, link: 551});
+sc({tick: 38, id: 1592, on: true, cell: 28, link: 1572});
+sc({tick: 38, id: 1016, on: true, cell: 10, link: 995});
+sc({tick: 38, id: 2089, on: true, cell: 25, link: 2101});
+sc({tick: 38, id: 2007, on: false, cell: 43, link: 1993});
+sc({tick: 38, id: 2040, on: true, cell: 7, link: 2050});
+sc({tick: 38, id: 2428, on: true, cell: 9, link: 2379});
+sc({tick: 38, id: 2297, on: true, cell: 51, link: 2276});
+sc({tick: 38, id: 171, on: true, cell: 15, link: 159});
+sc({tick: 38, id: 1432, on: true, cell: 8, link: 1431});
+sc({tick: 38, id: 2924, on: false, cell: 40, link: 2945});
+sc({tick: 40, id: 725, on: false, cell: 30, link: 695});
+sc({tick: 40, id: 1054, on: false, cell: 49, link: 1045});
+sc({tick: 40, id: 2278, on: true, cell: 51, link: 2297});
+sc({tick: 40, id: 1562, on: false, cell: 12, link: 1534});
+sc({tick: 40, id: 2330, on: true, cell: 45, link: 2336});
+sc({tick: 40, id: 2838, on: false, cell: 14, link: 2798});
+sc({tick: 40, id: 244, on: false, cell: 16, link: 258});
+sc({tick: 40, id: 1415, on: true, cell: 8, link: 1432});
+sc({tick: 40, id: 1987, on: true, cell: 43, link: 2007});
+sc({tick: 40, id: 1628, on: false, cell: 23, link: 1677});
+sc({tick: 40, id: 2902, on: true, cell: 40, link: 2924});
+sc({tick: 40, id: 510, on: true, cell: 42, link: 476});
+sc({tick: 40, id: 2710, on: false, cell: 11, link: 2722});
+sc({tick: 40, id: 450, on: false, cell: 31, link: 425});
+sc({tick: 40, id: 203, on: true, cell: 22, link: 229});
+l[40]=
+[{removed: 43}];
+s[40]=
+{apoptosis: 4};
+sc({tick: 42, id: 1024, on: true, cell: 10, link: 1025});
+sc({tick: 42, id: 635, on: false, cell: 52, link: 594});
+sc({tick: 42, id: 2521, on: false, cell: 38, link: 2537});
+sc({tick: 42, id: 2100, on: true, cell: 25, link: 2144});
+sc({tick: 42, id: 2809, on: false, cell: 14, link: 2838});
+sc({tick: 42, id: 366, on: false, cell: 41, link: 368});
+sc({tick: 42, id: 2688, on: false, cell: 11, link: 2710});
+sc({tick: 42, id: 1084, on: false, cell: 49, link: 1054});
+sc({tick: 42, id: 453, on: false, cell: 31, link: 450});
+sc({tick: 42, id: 508, on: true, cell: 42, link: 510});
+sc({tick: 42, id: 1430, on: false, cell: 8, link: 1415});
+sc({tick: 42, id: 2311, on: true, cell: 51, link: 2278});
+sc({tick: 42, id: 1133, on: true, cell: 47, link: 1141});
+sc({tick: 42, id: 2037, on: false, cell: 7, link: 2081});
+sc({tick: 44, id: 2518, on: true, cell: 38, link: 2521});
+sc({tick: 44, id: 1016, on: false, cell: 10, link: 1024});
+sc({tick: 44, id: 1426, on: false, cell: 8, link: 1430});
+sc({tick: 44, id: 447, on: false, cell: 31, link: 453});
+sc({tick: 44, id: 747, on: false, cell: 30, link: 742});
+sc({tick: 44, id: 2030, on: false, cell: 7, link: 2037});
+sc({tick: 44, id: 2832, on: false, cell: 14, link: 2809});
+sc({tick: 44, id: 2874, on: false, cell: 19, link: 2893});
+sc({tick: 44, id: 2781, on: false, cell: 50, link: 2775});
+sc({tick: 44, id: 841, on: false, cell: 27, link: 824});
+sc({tick: 46, id: 1720, on: true, cell: 29, link: 1730});
+sc({tick: 46, id: 222, on: true, cell: 22, link: 223});
+sc({tick: 46, id: 2942, on: false, cell: 40, link: 2924});
+sc({tick: 46, id: 266, on: false, cell: 16, link: 240});
+sc({tick: 46, id: 1025, on: false, cell: 10, link: 1016});
+sc({tick: 46, id: 411, on: false, cell: 31, link: 447});
+sc({tick: 46, id: 601, on: false, cell: 52, link: 592});
+sc({tick: 46, id: 2384, on: false, cell: 9, link: 2432});
+sc({tick: 48, id: 1176, on: true, cell: 26, link: 1201});
+sc({tick: 48, id: 2251, on: false, cell: 32, link: 2218});
+sc({tick: 48, id: 769, on: false, cell: 46, link: 759});
+sc({tick: 48, id: 2871, on: true, cell: 19, link: 2860});
+sc({tick: 48, id: 2042, on: true, cell: 7, link: 2055});
+sc({tick: 48, id: 823, on: false, cell: 27, link: 825});
+sc({tick: 48, id: 2680, on: false, cell: 11, link: 2690});
+sc({tick: 48, id: 2180, on: false, cell: 33, link: 2146});
+sc({tick: 48, id: 1313, on: false, cell: 37, link: 1278});
+sc({tick: 48, id: 1703, on: true, cell: 29, link: 1720});
+sc({tick: 50, id: 846, on: true, cell: 27, link: 823});
+sc({tick: 50, id: 2231, on: false, cell: 32, link: 2251});
+sc({tick: 50, id: 264, on: true, cell: 16, link: 271});
+sc({tick: 50, id: 2372, on: true, cell: 45, link: 2350});
+sc({tick: 50, id: 514, on: true, cell: 42, link: 469});
+sc({tick: 50, id: 2860, on: true, cell: 19, link: 2871});
+sc({tick: 50, id: 2459, on: false, cell: 5, link: 2490});
+sc({tick: 50, id: 1829, on: false, cell: 4, link: 1803});
+sc({tick: 50, id: 1204, on: false, cell: 26, link: 1176});
+sc({tick: 50, id: 2762, on: false, cell: 50, link: 2779});
+sc({tick: 50, id: 805, on: false, cell: 46, link: 769});
+sc({tick: 50, id: 1285, on: false, cell: 37, link: 1313});
+sc({tick: 52, id: 549, on: false, cell: 20, link: 569});
+sc({tick: 52, id: 2352, on: false, cell: 45, link: 2372});
+sc({tick: 52, id: 1836, on: false, cell: 4, link: 1829});
+sc({tick: 52, id: 82, on: false, cell: 18, link: 79});
+sc({tick: 52, id: 1944, on: false, cell: 35, link: 1967});
+sc({tick: 52, id: 270, on: true, cell: 16, link: 264});
+sc({tick: 52, id: 2259, on: false, cell: 32, link: 2231});
+sc({tick: 52, id: 798, on: false, cell: 46, link: 805});
+sc({tick: 52, id: 2701, on: true, cell: 11, link: 2675});
+sc({tick: 52, id: 2113, on: true, cell: 25, link: 2125});
+sc({tick: 52, id: 990, on: true, cell: 10, link: 1012});
+sc({tick: 52, id: 898, on: false, cell: 44, link: 871});
+sc({tick: 54, id: 2339, on: false, cell: 45, link: 2352});
+sc({tick: 54, id: 219, on: false, cell: 22, link: 212});
+sc({tick: 54, id: 310, on: true, cell: 24, link: 298});
+sc({tick: 54, id: 1815, on: true, cell: 4, link: 1836});
+sc({tick: 54, id: 92, on: false, cell: 18, link: 82});
+sc({tick: 54, id: 144, on: false, cell: 15, link: 150});
+sc({tick: 54, id: 1259, on: false, cell: 53, link: 1232});
+sc({tick: 54, id: 2402, on: false, cell: 9, link: 2418});
+sc({tick: 54, id: 532, on: false, cell: 20, link: 549});
+sc({tick: 54, id: 2749, on: false, cell: 50, link: 2745});
+sc({tick: 54, id: 1711, on: false, cell: 29, link: 1710});
+sc({tick: 56, id: 300, on: true, cell: 24, link: 310});
+sc({tick: 56, id: 456, on: true, cell: 31, link: 427});
+sc({tick: 56, id: 2772, on: true, cell: 50, link: 2749});
+sc({tick: 56, id: 1093, on: false, cell: 49, link: 1065});
+sc({tick: 56, id: 939, on: true, cell: 17, link: 968});
+sc({tick: 56, id: 199, on: true, cell: 22, link: 219});
+sc({tick: 56, id: 1295, on: true, cell: 37, link: 1329});
+sc({tick: 56, id: 2883, on: false, cell: 19, link: 2898});
+sc({tick: 56, id: 1616, on: false, cell: 28, link: 1608});
+sc({tick: 56, id: 91, on: false, cell: 18, link: 92});
+sc({tick: 56, id: 2362, on: false, cell: 45, link: 2339});
+sc({tick: 58, id: 397, on: false, cell: 41, link: 352});
+sc({tick: 58, id: 2681, on: true, cell: 11, link: 2701});
+sc({tick: 58, id: 2260, on: false, cell: 32, link: 2215});
+sc({tick: 58, id: 2508, on: true, cell: 38, link: 2548});
+sc({tick: 58, id: 2775, on: true, cell: 50, link: 2772});
+sc({tick: 58, id: 2456, on: false, cell: 5, link: 2475});
+sc({tick: 58, id: 2171, on: false, cell: 33, link: 2182});
+sc({tick: 58, id: 1578, on: false, cell: 28, link: 1616});
+sc({tick: 58, id: 1109, on: true, cell: 47, link: 1117});
+sc({tick: 58, id: 1060, on: false, cell: 49, link: 1093});
+sc({tick: 60, id: 1022, on: false, cell: 10, link: 1035});
+sc({tick: 60, id: 230, on: true, cell: 22, link: 225});
+sc({tick: 60, id: 1399, on: false, cell: 8, link: 1446});
+sc({tick: 60, id: 484, on: true, cell: 42, link: 490});
+sc({tick: 60, id: 2589, on: true, cell: 6, link: 2554});
+sc({tick: 60, id: 2673, on: true, cell: 11, link: 2681});
+sc({tick: 60, id: 1472, on: true, cell: 21, link: 1477});
+sc({tick: 60, id: 2239, on: false, cell: 32, link: 2260});
+sc({tick: 60, id: 2548, on: false, cell: 38, link: 2508});
+sc({tick: 60, id: 1608, on: false, cell: 28, link: 1578});
+sc({tick: 60, id: 2422, on: false, cell: 9, link: 2421});
+sc({tick: 60, id: 1261, on: false, cell: 53, link: 1227});
+sc({tick: 60, id: 784, on: false, cell: 46, link: 769});
+sc({tick: 60, id: 1119, on: true, cell: 47, link: 1109});
+sc({tick: 60, id: 2475, on: false, cell: 5, link: 2456});
+sc({tick: 62, id: 2707, on: true, cell: 11, link: 2673});
+sc({tick: 62, id: 1481, on: true, cell: 21, link: 1472});
+sc({tick: 62, id: 438, on: true, cell: 31, link: 445});
+sc({tick: 62, id: 2348, on: true, cell: 45, link: 2357});
+sc({tick: 62, id: 888, on: false, cell: 44, link: 908});
+sc({tick: 62, id: 759, on: false, cell: 46, link: 784});
+sc({tick: 62, id: 963, on: true, cell: 17, link: 966});
+sc({tick: 62, id: 184, on: false, cell: 22, link: 230});
+sc({tick: 62, id: 1118, on: false, cell: 47, link: 1119});
+sc({tick: 62, id: 77, on: true, cell: 18, link: 63});
+sc({tick: 62, id: 2758, on: false, cell: 50, link: 2781});
+sc({tick: 64, id: 2214, on: false, cell: 32, link: 2223});
+sc({tick: 64, id: 1942, on: false, cell: 35, link: 1921});
+sc({tick: 64, id: 275, on: false, cell: 16, link: 276});
+sc({tick: 64, id: 1841, on: false, cell: 4, link: 1811});
+sc({tick: 64, id: 2385, on: false, cell: 9, link: 2406});
+sc({tick: 64, id: 535, on: true, cell: 20, link: 532});
+sc({tick: 64, id: 2333, on: false, cell: 45, link: 2348});
+sc({tick: 64, id: 210, on: false, cell: 22, link: 184});
+sc({tick: 64, id: 1500, on: true, cell: 21, link: 1481});
+sc({tick: 64, id: 1133, on: false, cell: 47, link: 1118});
+sc({tick: 64, id: 1563, on: false, cell: 12, link: 1562});
+sc({tick: 64, id: 970, on: true, cell: 17, link: 963});
+sc({tick: 64, id: 788, on: true, cell: 46, link: 759});
+sc({tick: 66, id: 1519, on: false, cell: 12, link: 1563});
+sc({tick: 66, id: 2048, on: false, cell: 7, link: 2037});
+sc({tick: 66, id: 2430, on: false, cell: 9, link: 2385});
+sc({tick: 66, id: 2733, on: false, cell: 50, link: 2744});
+sc({tick: 66, id: 419, on: true, cell: 31, link: 446});
+sc({tick: 66, id: 805, on: true, cell: 46, link: 788});
+sc({tick: 66, id: 557, on: false, cell: 20, link: 535});
+sc({tick: 66, id: 271, on: false, cell: 16, link: 275});
+sc({tick: 66, id: 465, on: false, cell: 42, link: 520});
+sc({tick: 68, id: 808, on: true, cell: 46, link: 805});
+sc({tick: 68, id: 214, on: false, cell: 22, link: 218});
+sc({tick: 68, id: 232, on: false, cell: 16, link: 271});
+sc({tick: 68, id: 2500, on: false, cell: 38, link: 2508});
+sc({tick: 68, id: 388, on: true, cell: 41, link: 347});
+sc({tick: 70, id: 1072, on: true, cell: 49, link: 1064});
+sc({tick: 70, id: 797, on: false, cell: 46, link: 808});
+sc({tick: 70, id: 2334, on: false, cell: 45, link: 2325});
+sc({tick: 70, id: 223, on: false, cell: 22, link: 214});
+sc({tick: 70, id: 119, on: false, cell: 15, link: 168});
+sc({tick: 70, id: 536, on: false, cell: 20, link: 544});
+sc({tick: 70, id: 1024, on: false, cell: 10, link: 1025});
+sc({tick: 70, id: 443, on: false, cell: 31, link: 428});
+sc({tick: 70, id: 2603, on: false, cell: 6, link: 2560});
+sc({tick: 72, id: 1058, on: true, cell: 49, link: 1072});
+sc({tick: 72, id: 804, on: false, cell: 46, link: 797});
+sc({tick: 72, id: 1425, on: true, cell: 8, link: 1426});
+sc({tick: 72, id: 2726, on: true, cell: 50, link: 2731});
+sc({tick: 72, id: 707, on: false, cell: 30, link: 718});
+sc({tick: 72, id: 1224, on: false, cell: 53, link: 1261});
+sc({tick: 72, id: 552, on: true, cell: 20, link: 536});
+sc({tick: 72, id: 143, on: false, cell: 15, link: 119});
+sc({tick: 72, id: 1641, on: false, cell: 23, link: 1676});
+sc({tick: 72, id: 1852, on: true, cell: 4, link: 1843});
+sc({tick: 72, id: 2378, on: false, cell: 9, link: 2418});
+sc({tick: 74, id: 1071, on: false, cell: 49, link: 1058});
+sc({tick: 74, id: 556, on: true, cell: 20, link: 552});
+sc({tick: 74, id: 1900, on: false, cell: 39, link: 1894});
+sc({tick: 74, id: 2377, on: true, cell: 9, link: 2378});
+sc({tick: 74, id: 2805, on: false, cell: 14, link: 2822});
+sc({tick: 74, id: 751, on: false, cell: 30, link: 707});
+sc({tick: 74, id: 1651, on: true, cell: 23, link: 1641});
+sc({tick: 74, id: 609, on: false, cell: 52, link: 612});
+sc({tick: 74, id: 767, on: false, cell: 46, link: 804});
+sc({tick: 74, id: 501, on: false, cell: 42, link: 515});
+sc({tick: 74, id: 1810, on: true, cell: 4, link: 1852});
+sc({tick: 74, id: 1265, on: false, cell: 53, link: 1224});
+sc({tick: 74, id: 1325, on: false, cell: 37, link: 1318});
+sc({tick: 76, id: 2385, on: true, cell: 9, link: 2377});
+sc({tick: 76, id: 1402, on: true, cell: 8, link: 1417});
+sc({tick: 76, id: 1659, on: true, cell: 23, link: 1651});
+sc({tick: 76, id: 1312, on: false, cell: 37, link: 1325});
+sc({tick: 76, id: 701, on: true, cell: 30, link: 751});
+sc({tick: 76, id: 570, on: false, cell: 20, link: 556});
+sc({tick: 76, id: 2711, on: false, cell: 11, link: 2701});
+sc({tick: 76, id: 1832, on: true, cell: 4, link: 1810});
+sc({tick: 76, id: 1064, on: false, cell: 49, link: 1071});
+sc({tick: 76, id: 1262, on: true, cell: 53, link: 1265});
+sc({tick: 76, id: 252, on: false, cell: 16, link: 247});
+sc({tick: 76, id: 1859, on: true, cell: 39, link: 1900});
+sc({tick: 76, id: 758, on: false, cell: 46, link: 767});
+sc({tick: 76, id: 216, on: true, cell: 22, link: 225});
+sc({tick: 76, id: 2581, on: false, cell: 6, link: 2563});
+sc({tick: 78, id: 1567, on: false, cell: 28, link: 1622});
+sc({tick: 78, id: 413, on: true, cell: 31, link: 428});
+sc({tick: 78, id: 2554, on: false, cell: 6, link: 2581});
+sc({tick: 78, id: 2375, on: true, cell: 45, link: 2348});
+sc({tick: 78, id: 1885, on: true, cell: 39, link: 1859});
+sc({tick: 78, id: 2430, on: true, cell: 9, link: 2385});
+sc({tick: 78, id: 740, on: true, cell: 30, link: 701});
+sc({tick: 78, id: 952, on: false, cell: 17, link: 935});
+sc({tick: 78, id: 2777, on: true, cell: 50, link: 2726});
+sc({tick: 78, id: 2717, on: false, cell: 11, link: 2711});
+sc({tick: 80, id: 1397, on: false, cell: 8, link: 1433});
+sc({tick: 80, id: 616, on: false, cell: 52, link: 595});
+sc({tick: 80, id: 2684, on: false, cell: 11, link: 2717});
+sc({tick: 80, id: 1167, on: false, cell: 26, link: 1198});
+sc({tick: 80, id: 2342, on: true, cell: 45, link: 2375});
+sc({tick: 80, id: 703, on: false, cell: 30, link: 740});
+sc({tick: 80, id: 2498, on: false, cell: 38, link: 2516});
+sc({tick: 80, id: 2426, on: true, cell: 9, link: 2430});
+sc({tick: 80, id: 1477, on: true, cell: 21, link: 1489});
+sc({tick: 82, id: 2811, on: false, cell: 14, link: 2800});
+sc({tick: 82, id: 2767, on: false, cell: 50, link: 2769});
+sc({tick: 82, id: 2448, on: true, cell: 5, link: 2486});
+sc({tick: 82, id: 2336, on: false, cell: 45, link: 2342});
+sc({tick: 82, id: 1415, on: false, cell: 8, link: 1397});
+sc({tick: 82, id: 2699, on: false, cell: 11, link: 2684});
+sc({tick: 82, id: 2234, on: false, cell: 32, link: 2252});
+sc({tick: 82, id: 701, on: false, cell: 30, link: 703});
+sc({tick: 82, id: 1650, on: true, cell: 23, link: 1668});
+sc({tick: 84, id: 205, on: false, cell: 22, link: 221});
+sc({tick: 84, id: 2472, on: true, cell: 5, link: 2448});
+sc({tick: 84, id: 1052, on: true, cell: 49, link: 1092});
+sc({tick: 84, id: 740, on: false, cell: 30, link: 701});
+sc({tick: 84, id: 1430, on: true, cell: 8, link: 1415});
+sc({tick: 84, id: 2330, on: false, cell: 45, link: 2336});
+sc({tick: 84, id: 759, on: true, cell: 46, link: 784});
+sc({tick: 84, id: 156, on: false, cell: 15, link: 157});
+sc({tick: 86, id: 788, on: false, cell: 46, link: 759});
+sc({tick: 86, id: 2049, on: true, cell: 7, link: 2047});
+sc({tick: 86, id: 2509, on: false, cell: 38, link: 2513});
+sc({tick: 86, id: 1953, on: true, cell: 35, link: 1940});
+sc({tick: 86, id: 2695, on: false, cell: 11, link: 2716});
+sc({tick: 86, id: 1426, on: true, cell: 8, link: 1430});
+sc({tick: 86, id: 117, on: true, cell: 15, link: 156});
+sc({tick: 86, id: 1572, on: false, cell: 28, link: 1608});
+sc({tick: 86, id: 2237, on: false, cell: 32, link: 2257});
+sc({tick: 88, id: 1592, on: false, cell: 28, link: 1572});
+sc({tick: 88, id: 602, on: false, cell: 52, link: 632});
+sc({tick: 88, id: 2054, on: true, cell: 7, link: 2049});
+sc({tick: 88, id: 2757, on: true, cell: 50, link: 2746});
+sc({tick: 88, id: 1293, on: true, cell: 37, link: 1276});
+sc({tick: 88, id: 2669, on: true, cell: 11, link: 2695});
+sc({tick: 88, id: 1412, on: true, cell: 8, link: 1426});
+sc({tick: 88, id: 1111, on: false, cell: 47, link: 1128});
+sc({tick: 88, id: 1220, on: false, cell: 53, link: 1274});
+sc({tick: 88, id: 759, on: false, cell: 46, link: 788});
+sc({tick: 88, id: 159, on: true, cell: 15, link: 117});
+sc({tick: 90, id: 2577, on: true, cell: 6, link: 2567});
+sc({tick: 90, id: 171, on: false, cell: 15, link: 159});
+sc({tick: 90, id: 1809, on: false, cell: 4, link: 1798});
+sc({tick: 90, id: 788, on: true, cell: 46, link: 759});
+sc({tick: 90, id: 1411, on: true, cell: 8, link: 1412});
+sc({tick: 90, id: 1306, on: false, cell: 37, link: 1293});
+sc({tick: 90, id: 1611, on: false, cell: 28, link: 1592});
+sc({tick: 90, id: 2114, on: true, cell: 25, link: 2100});
+sc({tick: 90, id: 607, on: true, cell: 52, link: 602});
+sc({tick: 90, id: 2705, on: false, cell: 11, link: 2669});
+sc({tick: 90, id: 2927, on: true, cell: 40, link: 2937});
+l[90]=
+[{removed: 6}];
+s[90]=
+{apoptosis: 5};
+sc({tick: 92, id: 1576, on: true, cell: 28, link: 1611});
+sc({tick: 92, id: 2955, on: false, cell: 40, link: 2927});
+sc({tick: 92, id: 923, on: true, cell: 44, link: 913});
+sc({tick: 92, id: 1937, on: false, cell: 35, link: 1949});
+sc({tick: 92, id: 1892, on: false, cell: 39, link: 1867});
+sc({tick: 92, id: 61, on: true, cell: 18, link: 68});
+sc({tick: 92, id: 117, on: false, cell: 15, link: 171});
+sc({tick: 92, id: 759, on: true, cell: 46, link: 788});
+sc({tick: 94, id: 2671, on: false, cell: 11, link: 2677});
+sc({tick: 94, id: 981, on: true, cell: 17, link: 943});
+sc({tick: 94, id: 1215, on: false, cell: 26, link: 1190});
+sc({tick: 94, id: 1604, on: false, cell: 28, link: 1576});
+sc({tick: 94, id: 2466, on: false, cell: 5, link: 2444});
+sc({tick: 94, id: 159, on: false, cell: 15, link: 117});
+sc({tick: 96, id: 1924, on: false, cell: 35, link: 1964});
+sc({tick: 96, id: 2688, on: true, cell: 11, link: 2671});
+sc({tick: 96, id: 1678, on: true, cell: 23, link: 1659});
+sc({tick: 96, id: 1190, on: false, cell: 26, link: 1215});
+sc({tick: 96, id: 1551, on: false, cell: 12, link: 1521});
+sc({tick: 96, id: 1106, on: false, cell: 47, link: 1126});
+sc({tick: 98, id: 1086, on: false, cell: 49, link: 1088});
+sc({tick: 98, id: 1628, on: true, cell: 23, link: 1678});
+sc({tick: 98, id: 1151, on: false, cell: 47, link: 1106});
+sc({tick: 98, id: 2101, on: false, cell: 25, link: 2114});
+sc({tick: 98, id: 1507, on: false, cell: 12, link: 1551});
+sc({tick: 98, id: 2839, on: false, cell: 14, link: 2801});
+sc({tick: 98, id: 2671, on: true, cell: 11, link: 2688});
+l[99]=
+[{added: 3017},
+{added: 2958},
+{added: 3076},
+{x: 3, y: 1, z: 2, who: 3017},
+{x: 1, y: 1, z: -1, who: 3076},
+{x: 0, y: -1, z: 2, who: 2958}];
+s[99]=
+{proliferation: 3};
+sc({tick: 101, id: 1848, on: false, cell: 4, link: 1836});
+sc({tick: 101, id: 1676, on: true, cell: 23, link: 1628});
+sc({tick: 101, id: 3058, on: false, cell: 3017, link: 3039});
+sc({tick: 101, id: 2100, on: false, cell: 25, link: 2101});
+sc({tick: 101, id: 2688, on: false, cell: 11, link: 2671});
+sc({tick: 101, id: 1581, on: false, cell: 28, link: 1604});
+sc({tick: 101, id: 848, on: false, cell: 27, link: 830});
+sc({tick: 102, id: 1620, on: false, cell: 28, link: 1581});
+sc({tick: 102, id: 231, on: false, cell: 16, link: 256});
+sc({tick: 102, id: 2979, on: true, cell: 2958, link: 2963});
+replicates[replicate_counter++] = {l: l, s: s, state_changes: state_changes};
+l = [];
+s = [];
+
+minimum_x = Math.min(minimum_x, -2);
+maximum_x = Math.max(maximum_x, 3);
+minimum_y = Math.min(minimum_y, -2);
+maximum_y = Math.max(maximum_y, 2);
+
+parameters = ['the-number-of-replicates', 16.0,'the-maximum-number-of-ticks', 100.0,'the-maximum-cell-count', 300.0,'the-initial-cell-count', 50.0,'the-egf-diffusion-coefficient', 2.7E-14,'the-oxygen-diffusion-coefficient', 1.0E-9,'the-boundary-oxygen', 50.0,'the-initial-oxygen', 0.08,'Oxygen-consumption-rate', 5.0E-4,'Oxygen_supply-activation-threshold', 0.08,'EGFR_stimulus-activation-threshold', 0.01,'EGF-consumption-rate', 0.01,'EGF-production-rate', 1.0,'the-boundary-EGF', 0.0,'the-initial-egf', 0.0];
+start_time = '05:02:11.525 PM 11-Aug-2016';
+number_of_replicates_requested = 16;
+default_size = 1;
+default_colors = ['rgba(164, 164, 164, 0.71)'];
+running_3D = true;
+
+mutations_file_contents = "Percent 1.0<br>EGFR -0.01<br>";
+gene_nodes   = [
+{id: 2524, label: "SPRY"},
+{id: 2548, label: "MSK"},
+{id: 2495, label: "GAB1"},
+{id: 2510, label: "p14"},
+{id: 2517, label: "ATM"},
+{id: 2531, label: "EGFR"},
+{id: 2539, label: "CREB"},
+{id: 2498, label: "ATF2"},
+{id: 2528, label: "p53"},
+{id: 2538, label: "MEK1_2"},
+{id: 2518, label: "SMAD"},
+{id: 2526, label: "DUSP1"},
+{id: 2507, label: "GRB2"},
+{id: 2535, label: "PTEN"},
+{id: 2502, label: "HIF1"},
+{id: 2544, label: "FRS2"},
+{id: 2529, label: "BCL2"},
+{id: 2545, label: "MDM2"},
+{id: 2515, label: "ERK"},
+{id: 2540, label: "p38"},
+{id: 2493, label: "p21"},
+{id: 2497, label: "RAF"},
+{id: 2532, label: "PLCG"},
+{id: 2509, label: "JNK"},
+{id: 2501, label: "PDK1"},
+{id: 2511, label: "MAP3K1_3"},
+{id: 2504, label: "TAK1"},
+{id: 2533, label: "JUN"},
+{id: 2514, label: "SOS"},
+{id: 2522, label: "AP1"},
+{id: 2499, label: "MYC"},
+{id: 2527, label: "FOS"},
+{id: 2520, label: "p70"},
+{id: 2546, label: "PKC"},
+{id: 2503, label: "TGFBR"},
+{id: 2513, label: "MTK1"},
+{id: 2537, label: "RAS"},
+{id: 2542, label: "PI3K"},
+{id: 2496, label: "TAOK"},
+{id: 2543, label: "AKT"},
+{id: 2547, label: "MAX"},
+{id: 2550, label: "FGFR3"},
+{id: 2512, label: "PPP2CA"},
+{id: 2523, label: "RSK"},
+{id: 2521, label: "ELK1"},
+{id: 2530, label: "FOXO3"},
+{id: 2519, label: "GADD45"}
+];
+input_nodes  = [
+{id: 2500, label: "EGFR_stimulus"},
+{id: 2525, label: "Oxygen_supply"},
+{id: 2494, label: "DNA_damage"},
+{id: 2549, label: "FGFR3_stimulus"},
+{id: 2536, label: "TGFBR_stimulus"}
+];
+output_nodes = [
+{id: 2508, label: "EGF"},
+{id: 2506, label: "VEGF"}
+];
+links_between_nodes = [
+{from: 2521, to: 2527, color: "green"},
+{from: 2537, to: 2542, color: "green"},
+{from: 2531, to: 2507, color: "green"},
+{from: 2515, to: 2520, color: "green"},
+{from: 2523, to: 2514, color: "red"},
+{from: 2532, to: 2537, color: "green"},
+{from: 2514, to: 2542, color: "green"},
+{from: 2524, to: 2531, color: "green"},
+{from: 2513, to: 2540, color: "green"},
+{from: 2545, to: 2528, color: "red"},
+{from: 2540, to: 2528, color: "green"},
+{from: 2548, to: 2499, color: "green"},
+{from: 2515, to: 2524, color: "green"},
+{from: 2514, to: 2537, color: "green"},
+{from: 2525, to: 2541, color: "red"},
+{from: 2520, to: 2502, color: "green"},
+{from: 2507, to: 2544, color: "red"},
+{from: 2530, to: 2534, color: "green"},
+{from: 2496, to: 2509, color: "green"},
+{from: 2495, to: 2542, color: "green"},
+{from: 2501, to: 2543, color: "green"},
+{from: 2527, to: 2522, color: "green"},
+{from: 2550, to: 2532, color: "green"},
+{from: 2542, to: 2501, color: "green"},
+{from: 2523, to: 2527, color: "green"},
+{from: 2503, to: 2507, color: "green"},
+{from: 2499, to: 2505, color: "green"},
+{from: 2528, to: 2493, color: "green"},
+{from: 2538, to: 2515, color: "green"},
+{from: 2539, to: 2527, color: "green"},
+{from: 2528, to: 2519, color: "green"},
+{from: 2515, to: 2521, color: "green"},
+{from: 2529, to: 2534, color: "red"},
+{from: 2509, to: 2530, color: "green"},
+{from: 2515, to: 2527, color: "green"},
+{from: 2496, to: 2540, color: "green"},
+{from: 2509, to: 2521, color: "green"},
+{from: 2513, to: 2509, color: "green"},
+{from: 2512, to: 2538, color: "red"},
+{from: 2543, to: 2529, color: "green"},
+{from: 2537, to: 2511, color: "green"},
+{from: 2528, to: 2535, color: "green"},
+{from: 2537, to: 2497, color: "green"},
+{from: 2511, to: 2509, color: "green"},
+{from: 2543, to: 2530, color: "red"},
+{from: 2549, to: 2550, color: "green"},
+{from: 2518, to: 2519, color: "green"},
+{from: 2539, to: 2529, color: "green"},
+{from: 2509, to: 2533, color: "green"},
+{from: 2550, to: 2544, color: "green"},
+{from: 2533, to: 2522, color: "green"},
+{from: 2507, to: 2514, color: "green"},
+{from: 2535, to: 2543, color: "red"},
+{from: 2503, to: 2518, color: "green"},
+{from: 2515, to: 2523, color: "green"},
+{from: 2548, to: 2539, color: "green"},
+{from: 2526, to: 2540, color: "red"},
+{from: 2515, to: 2502, color: "green"},
+{from: 2515, to: 2497, color: "red"},
+{from: 2497, to: 2538, color: "green"},
+{from: 2500, to: 2531, color: "green"},
+{from: 2543, to: 2520, color: "green"},
+{from: 2517, to: 2528, color: "green"},
+{from: 2515, to: 2534, color: "red"},
+{from: 2502, to: 2508, color: "green"},
+{from: 2507, to: 2531, color: "red"},
+{from: 2531, to: 2532, color: "green"},
+{from: 2499, to: 2510, color: "green"},
+{from: 2542, to: 2495, color: "green"},
+{from: 2526, to: 2509, color: "red"},
+{from: 2515, to: 2548, color: "green"},
+{from: 2509, to: 2498, color: "green"},
+{from: 2501, to: 2520, color: "green"},
+{from: 2540, to: 2498, color: "green"},
+{from: 2543, to: 2493, color: "red"},
+{from: 2536, to: 2503, color: "green"},
+{from: 2525, to: 2502, color: "green"},
+{from: 2547, to: 2499, color: "green"},
+{from: 2546, to: 2497, color: "green"},
+{from: 2498, to: 2522, color: "green"},
+{from: 2539, to: 2526, color: "green"},
+{from: 2507, to: 2550, color: "red"},
+{from: 2546, to: 2550, color: "red"},
+{from: 2540, to: 2548, color: "green"},
+{from: 2517, to: 2496, color: "green"},
+{from: 2532, to: 2546, color: "green"},
+{from: 2519, to: 2513, color: "green"},
+{from: 2546, to: 2531, color: "red"},
+{from: 2507, to: 2495, color: "green"},
+{from: 2493, to: 2505, color: "red"},
+{from: 2524, to: 2544, color: "red"},
+{from: 2520, to: 2505, color: "green"},
+{from: 2540, to: 2521, color: "green"},
+{from: 2543, to: 2499, color: "green"},
+{from: 2510, to: 2545, color: "red"},
+{from: 2511, to: 2538, color: "green"},
+{from: 2522, to: 2538, color: "red"},
+{from: 2543, to: 2545, color: "green"},
+{from: 2511, to: 2540, color: "green"},
+{from: 2543, to: 2497, color: "red"},
+{from: 2503, to: 2504, color: "green"},
+{from: 2493, to: 2516, color: "green"},
+{from: 2504, to: 2540, color: "green"},
+{from: 2540, to: 2547, color: "green"},
+{from: 2502, to: 2506, color: "green"},
+{from: 2494, to: 2517, color: "green"},
+{from: 2540, to: 2512, color: "green"},
+{from: 2504, to: 2509, color: "green"},
+{from: 2544, to: 2507, color: "green"},
+{from: 2528, to: 2534, color: "green"},
+{from: 2528, to: 2545, color: "green"}
+];
+</script>
+</head>
+<body>
+</body>
+</html>
+

@@ -47,6 +47,12 @@
     var scene, camera, renderer, 
         statistics_3D, webGL_output;                // for displaying 3D
 
+    var edges, nodes, network;                      // for displaying the gene network 
+
+    var network_graphs = [];
+
+    var network_cell_id = 25; // for now
+
     var canvas_click_listener = function (event, index) {
         var canvas = event.target;
         var index = canvases.indexOf(event.target);
@@ -68,6 +74,11 @@
         var close_button_and_catption = document.createElement('div');
         var caption = document.createElement('p');
         var graphs = document.createElement('div');
+        var add_network_graph = function (gene_graph, row) {
+        	var td = document.createElement('td');
+			td.appendChild(gene_graph);
+			row.appendChild(td);
+        };
         var new_canvas, canvases_singleton;
         if (previous_replicate_states_singleton) {
         	// stop the previous animation
@@ -86,7 +97,25 @@
             new_canvas = document.createElement('canvas');
             canvases_singleton = [new_canvas];
             animation_row.appendChild(new_canvas);
-        }    
+        }
+        if (typeof gene_nodes !== 'undefined') {
+        	if (network_graphs.length === 0) {
+				// gene_nodes has the gene_nodes of each clone type (i.e. mutation_number)
+				gene_nodes.forEach(function (ignore, mutation_number) {
+									var callback = function () {
+											          network_graphs[mutation_number] = gene_graph;
+													  gene_graph.title = "Redder colours indicate higher percent of this gene in all of this clone type are active. You can zoom and pan.";
+												   };
+								    var gene_graph = create_network_graph(callback, mutation_number, 500, 300);
+									add_network_graph(gene_graph, animation_row);							
+				});
+        	} else {
+        		// already created network
+				network_graphs.forEach(function (gene_graph) {
+					                       add_network_graph(gene_graph, animation_row);
+				});
+        	}
+        } 
         graph_row.appendChild(graphs);
         close_button_and_catption.appendChild(caption);
         close_button_and_catption.appendChild(close_button);
@@ -387,7 +416,7 @@
 // 		stepcounttext.style.height = 100;
 // 		stepcounttext.style.backgroundColor = "blue";
 // 		stepcounttext.innerHTML = "no ticks yet";
-// 		stepcounttext.style.top = 0 + 'px';
+// 		stepcounttext.style.top = 0 + 'px'
 // 		stepcounttext.style.left = 100 + 'px';
 // 		document.body.appendChild(stepcounttext);
     };
@@ -431,6 +460,44 @@
             // display 3D the selected replicate -- not the miniatures
             var display_cell = running_3D && replicate_states.length === 1 ? display_cell_3D : display_cell_2D;
             var colors = running_3D && replicate_states.length === 1 ? [0xDF5B54, 0xA4A4A4] : default_colors;
+            var animate_network = function (activation_fractions) {
+            	var current_activation_fractions = activation_fractions[tick];
+            	var activation_color = function (fraction) {
+            		// given a number between 0 and 1 computes a color between white (0) and green (1)
+            		// square the fraction to make the differences more apparent 
+            		var shade = (1-fraction*fraction); 	
+            		return "rgba(" + Math.round(fraction*255) + ",127," + Math.round(shade*255) + ",1)";
+            	};
+            	if (!current_activation_fractions) {
+            		// this is recorded every other tick so use previous one
+            		current_activation_fractions = activation_fractions[tick-1];
+            	}
+            	if (!current_activation_fractions) {
+            		return;
+            	}
+            	if (gene_nodes.length === network_graphs.length) {
+            		// the network graphs have stabilsed
+            		network_graphs.forEach(function (network_graph, index) {
+											   var network_information = network_graph.network_information;
+											   var update_color = function (node_label) {
+												   var fraction = current_activation_fractions[index][node_label];
+												   var node_with_label;
+												   network_information.nodes.get().some(function (node) {
+													   if (node.label === node_label) {
+														   node_with_label = node;
+														   return true;
+													   }
+												   });
+												   if (node_with_label) {
+												   	   node_with_label.color = activation_color(fraction);
+												       node_with_label.title = node_label + " was active " + Math.round(100*fraction) + "%";
+												   	   network_information.nodes.update(node_with_label);
+												   }
+											   };
+											   Object.keys(current_activation_fractions[index]).forEach(update_color);
+											});
+            	}
+            }
             if (!replicate_states[0]) {
             	// stopped
             	return;
@@ -468,6 +535,7 @@
                      }
                      display_cell(cell, scale, radius, color);
                 });
+                animate_network(log.a);
             });
             if (running_3D && replicate_states.length === 1) {
                 renderer.render(scene, camera);
@@ -495,12 +563,12 @@
         display_frame();
     };
 
-    var add_network_graph = function (width, height, gene_font, input_output_font) {
+    var create_network_graph = function (callback, mutation_number, width, height, gene_font, input_output_font) {
  	    var options = {width:  width+"px",
  	                   height: height+"px",
  	                   edges: {arrows: 'to'},
 				       nodes: {color: 'yellow',
- 	                           font: gene_font || '16px arial'},
+ 	                           font: gene_font || '16px arial white'},
  	                   // layout should not change on refresh or when comparing similar networks
  	                   layout: {randomSeed: 0}};
  	    var graph_div = document.createElement('div');
@@ -518,9 +586,9 @@
         	var corrected_distance_to_center = radius*0.9;
         	var center = network.DOMtoCanvas({x: center_x_dom,
         	                                  y: center_y_dom});
-        	var gene_positions = network.getPositions(gene_nodes.map(function (node) { return node.id}));
+        	var gene_positions = network.getPositions(gene_nodes[mutation_number].map(function (node) { return node.id}));
         	var position, node, position_in_dom, x_distance, y_distance, distance, angle;
-        	gene_nodes.forEach(function (node) {
+        	gene_nodes[mutation_number].forEach(function (node) {
         		var scale = network.getScale();
         		var correction;
 				position = gene_positions[node.id];
@@ -534,42 +602,38 @@
         			correction = Math.max(radius/10, (distance-radius)*2)/scale; 
         			node.x = position.x-Math.cos(angle)*correction;
         			node.y = position.y-Math.sin(angle)*correction;
-//                     nodes.add({id: node.id+1000, label: node.label, color: 'red', x: position.x-Math.cos(angle)*correction, y: position.y-Math.sin(angle)*correction, fixed: true, physics: false});
+//                  nodes.add({id: node.id+1000, label: node.label, color: 'red', x: position.x-Math.cos(angle)*correction, y: position.y-Math.sin(angle)*correction, fixed: true, physics: false});
 //         			console.log("Moved " + node.label + " from " + position.x + "," + position.y + " to " + node.x + "," + node.y + " where centre is at " + center.x + "," + center.y);
         		}
         		node.physics = false;       		
         	});
         };
-        var x, y, angle, dom_location, edges, nodes, data, network;
-        input_nodes.forEach(function (node) {
+        var x, y, angle, dom_location;
+        input_nodes[mutation_number].forEach(function (node) {
         	node.color = 'pink';
         	node.shape = 'box';
         	node.font = input_output_font || '24px arial';
         	node.physics = false;
         });
-        output_nodes.forEach(function (node) {
+        output_nodes[mutation_number].forEach(function (node) {
         	node.color = 'orange';
         	node.shape = 'box';
         	node.font = input_output_font || '24px arial';
         	node.physics = false;
         });
-        nodes = new vis.DataSet(gene_nodes);
-        edges = new vis.DataSet(links_between_nodes);
-        data = {nodes: nodes,
-                edges: edges
-        };
+        nodes = new vis.DataSet(gene_nodes[mutation_number]);
+        edges = new vis.DataSet(links_between_nodes[mutation_number]);
  	    graph_div.className = 'network-graph';
-        document.body.appendChild(graph_div);
-        network = new vis.Network(graph_div, data, options);
+        network = new vis.Network(graph_div, {nodes: nodes, edges: edges}, options);
         network.addEventListener('stabilizationIterationsDone',
-									function () {
+							     function () {
 										var container_center = network.DOMtoCanvas({x: center_x_dom, y: center_y_dom});
 										var scale = network.getScale();
 										cell_outline.x = container_center.x;
 										cell_outline.y = container_center.y;
 										cell_outline.font = Math.round(radius/scale) + 'px arial';
 										nodes.add(cell_outline);
-										input_nodes.forEach(function (node) {
+										input_nodes[mutation_number].forEach(function (node) {
 											// ideally should use bounding box to determine how much to move it the right so it is just outside the circle
 											// but length of label is good approximation
 											x = center_x_dom+Math.cos(angle)*radius-(node.label.length+1)*5;
@@ -577,10 +641,10 @@
 											dom_location = network.DOMtoCanvas({x: x, y: y});
 											node.x = dom_location.x;
 											node.y = dom_location.y;
-											angle -= Math.PI/(2*(input_nodes.length-1));
+											angle -= Math.PI/(2*(input_nodes[mutation_number].length-1));
 										});
 										angle = Math.PI/4; // 45 degrees (north east)
-										output_nodes.forEach(function (node) {
+										output_nodes[mutation_number].forEach(function (node) {
 											// ideally should use bounding box to determine how much to move it the right so it is just outside the circle
 											// but length of label is good approximation
 											x = center_x_dom+Math.cos(angle)*radius+(node.label.length+1)*5;
@@ -588,13 +652,21 @@
 											dom_location = network.DOMtoCanvas({x: x, y: y});
 											node.x = dom_location.x;
 											node.y = dom_location.y;
-											angle -= Math.PI/(2*(output_nodes.length-1));
+											angle -= Math.PI/(2*(output_nodes[mutation_number].length-1));
 										});
-										nodes.add(input_nodes);
-										nodes.add(output_nodes);
+										nodes.add(input_nodes[mutation_number]);
+										nodes.add(output_nodes[mutation_number]);
 										update_gene_positions();
-										nodes.update(gene_nodes);						
-									});
+										nodes.update(gene_nodes[mutation_number]);
+										callback();					
+								});
+		graph_div.network_information = {mutation_number: mutation_number,
+		                                 network:      network,
+		                                 gene_nodes:   gene_nodes,
+		                                 input_nodes:  input_nodes,
+		                                 output_nodes: output_nodes,
+		                                 nodes:        nodes,
+		                                 edges:        edges};				
         return graph_div;
     };
 
@@ -613,14 +685,11 @@
             document.body.appendChild(div);
         };
         var parameters_table = "<table class='parameters-table'><tr><th>Parameter</th><th>Value</th></tr>";
-        var gene_graph, i;
+        var i;
         addParagraph("<h1>" + replicates.length + " out of " + number_of_replicates_requested + " results from running microC</h1>");
         addParagraph("Submitted at " + start_time);
         if (typeof parameters !== 'undefined') {
         	addParagraph("See <a href='#parameters'>the general settings</a>.");
-        }
-        if (typeof gene_nodes !== 'undefined') {
-			addParagraph("See <a href='#network'>the regulatory network</a>.");
         }
         if (typeof mutations_file_contents !== 'undefined') {
 			addParagraph("See <a href='#mutations'>the mutation settings</a>.");
@@ -639,11 +708,6 @@
         addDiv('all-apoptosis');
         addDiv('all-growth_arrest');
         addDiv('all-necrosis');
-        addParagraph("<h2>Regulatory Network</h2>", 'network');
-        if (typeof gene_nodes !== 'undefined') {
-        	gene_graph = add_network_graph(1000, 600);
-       	    gene_graph.title = "You can zoom and pan. And drag nodes.";
-        }
         if (typeof parameters !== 'undefined') {
 			addParagraph("<h2>Settings</h2>", 'parameters');
 			for (i = 0; i < parameters.length; i += 2) {
