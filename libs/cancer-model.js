@@ -472,10 +472,7 @@
             		// this is recorded every other tick so use previous one
             		current_activation_fractions = activation_fractions[tick-1];
             	}
-            	if (!current_activation_fractions) {
-            		return;
-            	}
-            	if (gene_nodes.length === network_graphs.length) {
+            	if (current_activation_fractions && gene_nodes.length === network_graphs.length) {
             		// the network graphs have stabilsed
             		network_graphs.forEach(function (network_graph, index) {
 											   var network_information = network_graph.network_information;
@@ -558,6 +555,8 @@
                            frame_duration);
             } else if (callback) {
                 callback();
+            } else if (running_3D && replicate_states.length === 1) {
+                renderer.context.canvas.addEventListener('mousemove', mouse_move_listener);
             }
         };
         display_frame();
