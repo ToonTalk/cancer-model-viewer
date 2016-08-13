@@ -490,7 +490,7 @@
 												   });
 												   if (node_with_label) {
 												   	   node_with_label.color = activation_color(fraction);
-												       node_with_label.title = node_label + " was active " + Math.round(100*fraction) + "%";
+												       node_with_label.title = node_label + " is active in " + Math.round(100*fraction) + "% of the cells of this clone type.";
 												   	   network_information.nodes.update(node_with_label);
 												   }
 											   };
