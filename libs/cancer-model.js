@@ -79,6 +79,7 @@
 			td.appendChild(gene_graph);
 			row.appendChild(td);
         };
+        var canvas_td = document.createElement('td');
         var new_canvas, canvases_singleton;
         if (previous_replicate_states_singleton) {
         	// stop the previous animation
@@ -92,12 +93,13 @@
         graph_row.appendChild(graph_table_header);
         if (running_3D) {
 //             animation_row.appendChild(statistics_3D);
-            animation_row.appendChild(webGL_output);
+			canvas_td.appendChild(webGL_output)
         } else {
             new_canvas = document.createElement('canvas');
             canvases_singleton = [new_canvas];
-            animation_row.appendChild(new_canvas);
+            canvas_td.appendChild(new_canvas);
         }
+        animation_row.appendChild(canvas_td);
         if (typeof gene_nodes !== 'undefined') {
         	if (network_graphs.length === 0) {
 				// gene_nodes has the gene_nodes of each clone type (i.e. mutation_number)
