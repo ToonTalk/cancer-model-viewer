@@ -47,11 +47,7 @@
     var scene, camera, renderer, 
         statistics_3D, webGL_output;                // for displaying 3D
 
-    var edges, nodes, network;                      // for displaying the gene network 
-
     var network_graphs = [];
-
-    var network_cell_id = 25; // for now
 
     var canvas_click_listener = function (event, index) {
         var canvas = event.target;
@@ -493,7 +489,9 @@
 												   	   network_information.nodes.update(node_with_label);
 												   }
 											   };
-											   Object.keys(current_activation_fractions[index]).forEach(update_color);
+											   if (current_activation_fractions[index]) {
+											   	   Object.keys(current_activation_fractions[index]).forEach(update_color);
+											   }
 											});
             	}
             }
@@ -582,7 +580,7 @@
         var radius = Math.min(width, height)/2;
         var center_x_dom = width/2;
         var center_y_dom = height/2;
-        var update_gene_positions = function (positions) {
+        var update_gene_positions = function () {
         	// updates nodes whose positions are more than radius from the center
         	var corrected_distance_to_center = radius*0.9;
         	var center = network.DOMtoCanvas({x: center_x_dom,
@@ -609,6 +607,7 @@
         		node.physics = false;       		
         	});
         };
+        var edges, nodes, network;
         var x, y, angle, dom_location;
         input_nodes[mutation_number].forEach(function (node) {
         	node.color = 'pink';
