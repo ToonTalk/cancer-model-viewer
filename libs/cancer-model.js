@@ -70,10 +70,22 @@
         var close_button_and_catption = document.createElement('div');
         var caption = document.createElement('p');
         var graphs = document.createElement('div');
-        var add_network_graph = function (gene_graph, row) {
-        	var td = document.createElement('td');
-			td.appendChild(gene_graph);
-			row.appendChild(td);
+        var add_network_graph = function (gene_graph, table, caption) {
+        	var tr1 = document.createElement('tr');
+        	var td1 = document.createElement('td');
+        	var tr2 = document.createElement('tr');
+        	var td2 = document.createElement('td');
+        	var caption_div = document.createElement('div');
+        	caption_div.innerHTML = caption;
+        	td1.appendChild(caption_div);
+        	tr1.appendChild(td1);
+        	table.appendChild(tr1);
+			td2.appendChild(gene_graph);
+			tr2.appendChild(td2);
+			table.appendChild(tr2);
+        };
+        var caption_html = function (color) {
+        	return "<h3>Network for <span style='width:32px;height:32px;border-radius:32px;background-color:" + color + ";'></div> cells</h3>";
         };
         var canvas_td = document.createElement('td');
         var new_canvas, canvases_singleton;
@@ -96,6 +108,10 @@
             canvas_td.appendChild(new_canvas);
         }
         animation_row.appendChild(canvas_td);
+        close_button_and_catption.appendChild(caption);
+        close_button_and_catption.appendChild(close_button);
+        animation_and_graph_table.appendChild(close_button_and_catption);
+        animation_and_graph_table.appendChild(animation_row);
         if (typeof gene_nodes !== 'undefined') {
         	if (network_graphs.length === 0) {
 				// gene_nodes has the gene_nodes of each clone type (i.e. mutation_number)
@@ -104,21 +120,17 @@
 											          network_graphs[mutation_number] = gene_graph;
 													  gene_graph.title = "Redder colours indicate higher percent of this gene in all of this clone type are active. You can zoom and pan.";
 												   };
-								    var gene_graph = create_network_graph(callback, mutation_number, 500, 300);
-									add_network_graph(gene_graph, animation_row);							
+								    var gene_graph = create_network_graph(callback, mutation_number, 800, 500);
+									add_network_graph(gene_graph, animation_and_graph_table, caption_html(default_colors[mutation_number-1]));						
 				});
         	} else {
         		// already created network
-				network_graphs.forEach(function (gene_graph) {
-					                       add_network_graph(gene_graph, animation_row);
+				network_graphs.forEach(function (gene_graph, index) {
+					                       add_network_graph(gene_graph, animation_and_graph_table, caption_html(default_colors[index]));
 				});
         	}
         } 
         graph_row.appendChild(graphs);
-        close_button_and_catption.appendChild(caption);
-        close_button_and_catption.appendChild(close_button);
-        animation_and_graph_table.appendChild(close_button_and_catption);
-        animation_and_graph_table.appendChild(animation_row);
         animation_and_graph_table.appendChild(graph_row);
         close_button.textContent = "Close inspection of replicate #" + (index+1);
         graphs.id = "replicate-#" + index;
