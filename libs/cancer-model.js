@@ -454,10 +454,29 @@
         var mouse_move_listener = function (event) {      	            
             renderer.render(scene, camera);
         };
+        var rgb_to_hex = function(color) {
+        	// based on http://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
+            color = color.replace(/\s/g,"");
+            // remove decimal point that might be in the alpha fraction
+            color = color.replace(".","");
+            var aRGB = color.match(/^rgb\((\d{1,3}[%]?),(\d{1,3}[%]?),(\d{1,3}[%]?)\)$/i);
+            if (!aRGB) {
+                // was not rgb so try rgba
+                aRGB = color.match(/^rgba\((\d{1,3}[%]?),(\d{1,3}[%]?),(\d{1,3}[%]?),(\d{1,3}[%]?)\)$/i);
+            }
+            if (aRGB) {
+                color = '';
+                for (var i=1;  i<=3; i++) color += Math.round((aRGB[i][aRGB[i].length-1]=="%"?2.55:1)*parseInt(aRGB[i])).toString(16).replace(/^(.)$/,'0$1');
+             } else {
+                color = color.replace(/^#?([\da-f])([\da-f])([\da-f])$/i, '$1$1$2$2$3$3');
+             }
+             return '#'+color;
+		};
         var display_frame = function () {
             // display 3D the selected replicate -- not the miniatures
             var display_cell = running_3D && replicate_states.length === 1 ? display_cell_3D : display_cell_2D;
-            var colors = running_3D && replicate_states.length === 1 ? [0xDF5B54, 0xA4A4A4] : default_colors;
+            // three.js wants colours as hex not rgba(...) strings
+            var colors = running_3D && replicate_states.length === 1 ? default_colors.map(function (color) {return rgb_to_hex(color)}) : default_colors;
             var animate_network = function (activation_fractions) {
             	var current_activation_fractions = activation_fractions[tick];
             	var activation_color = function (fraction) {
@@ -572,8 +591,12 @@
  	                   layout: {randomSeed: 0}};
  	    var graph_div = document.createElement('div');
         var angle = 5*Math.PI/4; // 315 degrees (north west)
+        var background_cell_color = function (rgba) {
+        	var last_comma_index = rgba.lastIndexOf(',');
+        	return rgba.substring(0, last_comma_index+1) + " .05)";
+        };
         var cell_outline = {id: 0,
-                            color: 'rgba(255, 127, 0, .05)',
+                            color: background_cell_color(default_colors[mutation_number-1]),
                             label: ' ',
                             physics: false,
                             fixed: true};
