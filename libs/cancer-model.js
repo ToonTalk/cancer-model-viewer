@@ -71,7 +71,7 @@
         var close_button_and_catption = document.createElement('div');
         var caption = document.createElement('p');
         var graphs = document.createElement('div');
-        var add_network_graph = function (gene_graph, table, caption) {
+        var add_network_graph = function (gene_graph, table, caption, mutation_number) {
         	var tr1 = document.createElement('tr');
         	var td1 = document.createElement('td');
         	var tr2 = document.createElement('tr');
@@ -85,8 +85,15 @@
 			tr2.appendChild(td2);
 			table.appendChild(tr2);
         };
-        var caption_html = function (color) {
-        	return "<h3>Network for <span style='width:32px;height:32px;border-radius:32px;background-color:" + color + ";'></div> cells</h3>";
+        var caption_html = function (color, mutation_number) {
+        	var circle = "<div style=';display:inline-block;width:32px;height:32px;border-radius:32px;background-color:" + color + ";'> </div>";
+        	var caption;
+        	if (mutation_number === 0) {
+				caption = "Network for unmutated cells.";
+        	} else {
+        		caption = "Network for mutated cells of type " + mutation_number + ". ";
+        	}
+        	return "<h3>" + circle + " " + caption + "</h3>";
         };
         var canvas_td = document.createElement('td');
         var new_canvas, canvases_singleton;
@@ -111,17 +118,17 @@
         	if (network_graphs.length === 0) {
 				// gene_nodes has the gene_nodes of each clone type (i.e. mutation_number)
 				gene_nodes.forEach(function (ignore, mutation_number) {
-									var callback = function () {
-											          network_graphs[mutation_number] = gene_graph;
-													  gene_graph.title = "Redder colours indicate higher average number of state changes of this gene in all occurences of this clone type. Size indicates the fraction active.";
-												   };
-								    var gene_graph = create_network_graph(callback, mutation_number, 800, 500);
-									add_network_graph(gene_graph, animation_and_graph_table, caption_html(default_colors[mutation_number-1]));						
+									   var callback = function () {
+											              network_graphs[mutation_number] = gene_graph;
+													      gene_graph.title = "Redder colours indicate higher average number of state changes of this gene in all occurences of this clone type. Size indicates the fraction active.";
+												      };
+								       var gene_graph = create_network_graph(callback, mutation_number, 800, 500);
+									   add_network_graph(gene_graph, animation_and_graph_table, caption_html(default_colors[mutation_number-1], mutation_number-1));						
 				});
         	} else {
         		// already created network
 				network_graphs.forEach(function (gene_graph, index) {
-					                       add_network_graph(gene_graph, animation_and_graph_table, caption_html(default_colors[index]));
+					                       add_network_graph(gene_graph, animation_and_graph_table, caption_html(default_colors[index], index));
 				});
         	}
         } 
@@ -514,6 +521,7 @@
 											   var network_information = network_graph.network_information;
 											   var update_color = function (node_label) {
 												   var fraction = current_activation_fractions[index][node_label].a;
+												   fraction = fraction / 100; // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 												   var change_count = current_activation_fractions[index][node_label].c;
 												   var node_with_label;
 												   network_information.nodes.get().some(function (node) {
@@ -646,8 +654,6 @@
         			correction = Math.max(radius/10, (distance-radius)*2)/scale; 
         			node.x = position.x-Math.cos(angle)*correction;
         			node.y = position.y-Math.sin(angle)*correction;
-//                  nodes.add({id: node.id+1000, label: node.label, color: 'red', x: position.x-Math.cos(angle)*correction, y: position.y-Math.sin(angle)*correction, fixed: true, physics: false});
-//         			console.log("Moved " + node.label + " from " + position.x + "," + position.y + " to " + node.x + "," + node.y + " where centre is at " + center.x + "," + center.y);
         		}
         		node.physics = false;       		
         	});
