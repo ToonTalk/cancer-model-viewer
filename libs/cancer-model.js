@@ -53,14 +53,14 @@
 
     var canvas_click_listener = function (event, index) {
         var canvas = event.target;
-        var index = canvases.indexOf(event.target);
-        var replicate_states_singleton = [replicate_states[index]];
+        var replicate_number = canvases.indexOf(event.target);
+        var replicate_states_singleton = [replicate_states[replicate_number]];
         var caption_element = document.getElementById('canvases-caption');
         var remove_canvas = function () {
             animation_and_graph_table.parentElement.removeChild(animation_and_graph_table);
             replicate_states_singleton[0] = null; // to stop the animation
         }
-        var time_monitor_id = "time-monitor-of-" + index;
+        var time_monitor_id = "time-monitor-of-" + replicate_number;
         var animation_and_graph_table = document.createElement('table');
         var animation_row             = document.createElement('tr');
         var graph_row                 = document.createElement('tr');
@@ -68,7 +68,7 @@
         var animation_table_cell      = document.createElement('td');
         var graph_table_cell          = document.createElement('td');
         var close_button              = document.createElement('button');
-        var close_button_and_catption = document.createElement('div');
+        var close_button_and_caption  = document.createElement('td');
         var caption = document.createElement('p');
         var graphs = document.createElement('div');
         var add_network_graph = function (gene_graph, table, caption, mutation_number) {
@@ -76,9 +76,32 @@
         	var td1 = document.createElement('td');
         	var tr2 = document.createElement('tr');
         	var td2 = document.createElement('td');
-        	var caption_div = document.createElement('div');
-        	caption_div.innerHTML = caption;
-        	td1.appendChild(caption_div);
+        	var caption_h3 = document.createElement('h3');
+        	var view_data_button = document.createElement('button');
+        	var view_data_click_handler = function (event) {
+        		var data = "Replicate\t\Mutation\tTime\tGene\tActivation\tAverage-changes\n";
+        		view_data_button.textContent = "Please wait. This can take several seconds.";
+        		replicates[replicate_number].a.forEach(function (record, time) {
+					if (record[mutation_number]) {
+						Object.keys(record[mutation_number]).forEach(function (label) {
+							var activation_and_changes = record[mutation_number][label];
+							data += replicate_number + '\t' + mutation_number + "\t" + time + '\t' + label + '\t' + activation_and_changes.a + '\t' + activation_and_changes.c + "\n";
+						});
+					}		
+        		});
+        		copy_to_clipboard(data);
+        		view_data_button.textContent = button_label;
+        		// tried window.prompt("Type Ctrl+C and Enter to copy to the clipboard. Then paste the data into a spreadsheet.", data);
+        		// but there is a small size limit
+        	};
+        	var button_label = "Copy network data to the clipboard"
+        	view_data_button.textContent = button_label;
+        	view_data_button.title = "Click to display the data used in the following network. Suitable for copying and pasting into a spreadsheet for further analysis.";
+        	view_data_button.addEventListener('click', view_data_click_handler);
+        	view_data_button.className = 'microc-button';
+        	caption_h3.innerHTML = caption;
+        	td1.appendChild(caption_h3);
+        	caption_h3.appendChild(view_data_button);
         	tr1.appendChild(td1);
         	table.appendChild(tr1);
 			td2.appendChild(gene_graph);
@@ -89,11 +112,11 @@
         	var circle = "<div style=';display:inline-block;width:32px;height:32px;border-radius:32px;background-color:" + color + ";'> </div>";
         	var caption;
         	if (mutation_number === 0) {
-				caption = "Network for unmutated cells.";
+				caption = "Network for unmutated cells. ";
         	} else {
         		caption = "Network for mutated cells of type " + mutation_number + ". ";
         	}
-        	return "<h3>" + circle + " " + caption + "</h3>";
+        	return circle + " " + caption;
         };
         var canvas_td = document.createElement('td');
         var new_canvas, canvases_singleton;
@@ -101,7 +124,7 @@
         	// stop the previous animation
         	previous_replicate_states_singleton[0] = null;
         }
-        caption.innerHTML = "<tr><td>Animation of replicate #" + (index+1) + " at time <span id='" + time_monitor_id + "'>0</span>.</td></tr>";
+        caption.innerHTML = "<tr><td>Animation of replicate #" + (replicate_number+1) + " at time <span id='" + time_monitor_id + "'>0</span>.</td></tr>";
         if (running_3D) {
 			canvas_td.appendChild(webGL_output)
         } else {
@@ -110,9 +133,9 @@
             canvas_td.appendChild(new_canvas);
         }
         animation_row.appendChild(canvas_td);
-        close_button_and_catption.appendChild(caption);
-        close_button_and_catption.appendChild(close_button);
-        animation_and_graph_table.appendChild(close_button_and_catption);
+        close_button_and_caption.appendChild(caption);
+        close_button_and_caption.appendChild(close_button);
+        animation_and_graph_table.appendChild(close_button_and_caption);
         animation_and_graph_table.appendChild(animation_row);
         if (typeof gene_nodes !== 'undefined') {
         	if (network_graphs.length === 0) {
@@ -123,19 +146,20 @@
 													      gene_graph.title = "Redder colours indicate higher average number of state changes of this gene in all occurences of this clone type. Size indicates the fraction active.";
 												      };
 								       var gene_graph = create_network_graph(callback, mutation_number, 800, 500);
-									   add_network_graph(gene_graph, animation_and_graph_table, caption_html(default_colors[mutation_number-1], mutation_number-1));						
+									   add_network_graph(gene_graph, animation_and_graph_table, caption_html(default_colors[mutation_number-1]), mutation_number, mutation_number-1);						
 				});
         	} else {
         		// already created network
 				network_graphs.forEach(function (gene_graph, index) {
-					                       add_network_graph(gene_graph, animation_and_graph_table, caption_html(default_colors[index], index));
+					                       add_network_graph(gene_graph, animation_and_graph_table, caption_html(default_colors[replicate_number], index+1), index);
 				});
         	}
         } 
         graph_row.appendChild(graphs);
         animation_and_graph_table.appendChild(graph_row);
-        close_button.textContent = "Close inspection of replicate #" + (index+1);
-        graphs.id = "replicate-#" + index;
+        close_button.textContent = "Close inspection of replicate #" + (replicate_number+1);
+        close_button.className = 'microc-button';
+        graphs.id = "replicate-#" + replicate_number;
         // perhaps better to set the dimensions using the Plotly API
         graphs.style.width  = "600px";
         graphs.style.height = "400px";
@@ -143,7 +167,12 @@
         close_button.addEventListener('click', remove_canvas);
         // animate this single replicate at a larger size
         animate_cells(replicate_states_singleton, canvases_singleton, expanded_size, 20, false, 2, time_monitor_id);
-        display_replicate(graphs.id, "Cell events for replicate #" + (index+1), replicate_proliferation_values[index], replicate_apoptosis_values[index], replicate_growth_arrest_values[index], replicate_necrosis_values[index]);
+        display_replicate(graphs.id, 
+                          "Cell events for replicate #" + (replicate_number+1),
+                          replicate_proliferation_values[replicate_number],
+                          replicate_apoptosis_values[replicate_number],
+                          replicate_growth_arrest_values[replicate_number],
+                          replicate_necrosis_values[replicate_number]);
         previous_replicate_states_singleton = replicate_states_singleton;
     };
 
@@ -523,6 +552,8 @@
 												   var fraction = current_activation_fractions[index][node_label].a;
 												   var change_count = current_activation_fractions[index][node_label].c;
 												   var node_with_label = find_node_with_label(node_label, network_information.nodes.get());
+												   	fraction = fraction / 100; // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 												   if (node_with_label) {
 												   	   node_with_label.color = change_count_color(change_count);
 												   	   node_with_label.font  = activation_font(fraction);
@@ -787,6 +818,56 @@
 		           });
 		return node_with_label;
     };
+
+    var copy_to_clipboard = function (text) {
+    	  // based on http://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript
+		  var textArea = document.createElement("textarea");
+		  //
+		  // *** This styling is an extra step which is likely not required. ***
+		  //
+		  // Why is it here? To ensure:
+		  // 1. the element is able to have focus and selection.
+		  // 2. if element was to flash render it has minimal visual impact.
+		  // 3. less flakyness with selection and copying which **might** occur if
+		  //    the textarea element is not visible.
+		  //
+		  // The likelihood is the element won't even render, not even a flash,
+		  // so some of these are just precautions. However in IE the element
+		  // is visible whilst the popup box asking the user for permission for
+		  // the web page to copy to the clipboard.
+		  //
+		  // Place in top-left corner of screen regardless of scroll position.
+		  textArea.style.position = 'fixed';
+		  textArea.style.top = 0;
+		  textArea.style.left = 0;
+		  // Ensure it has a small width and height. Setting to 1px / 1em
+		  // doesn't work as this gives a negative w/h on some browsers.
+		  textArea.style.width = '2em';
+		  textArea.style.height = '2em';
+		  // We don't need padding, reducing the size if it does flash render.
+		  textArea.style.padding = 0;
+		  // Clean up any borders.
+		  textArea.style.border = 'none';
+		  textArea.style.outline = 'none';
+		  textArea.style.boxShadow = 'none';
+		  // Avoid flash of white box if rendered for any reason.
+		  textArea.style.background = 'transparent';
+		  textArea.value = text;
+		  document.body.appendChild(textArea);
+		  textArea.select();
+		  try {
+			if (document.execCommand('copy')) {
+				alert("Data is on the clipboard. Copy it to a spreadsheet.")
+			} else {
+				alert("This browser failed to put the data on clipboard. Data in next alert.");
+			    alert(text);
+			}
+		  } catch (error) {
+			alert("This browser raised an error putting data on clipboard." + error + " Data in next alert.");
+			alert(text);
+		  }
+		  document.body.removeChild(textArea);
+	};
 
     var display_mean = function(id, label, mean_values, standard_deviation_values) {
 

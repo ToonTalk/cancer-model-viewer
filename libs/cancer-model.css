@@ -25,3 +25,13 @@ body {
 	border: 1px solid lightgray;
 	border-radius: 8px;
 }
+
+.microc-button {
+	display: inline-block;
+	border-radius: 8px;
+	background-color: lightpink;
+	font-family: 'arial';
+	font-weight: bold;
+	font-size: 16px;
+	padding: 6px;
+}
