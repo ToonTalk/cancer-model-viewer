@@ -44,6 +44,8 @@
 
     var expanded_size = 16;                         // size when running expanded
 
+    var gene_font_size = 24;                        // maximum font size if active 100% of the time
+
     var scene, camera, renderer, 
         statistics_3D, webGL_output;                // for displaying 3D
 
@@ -118,7 +120,7 @@
 				gene_nodes.forEach(function (ignore, mutation_number) {
 									var callback = function () {
 											          network_graphs[mutation_number] = gene_graph;
-													  gene_graph.title = "Redder colours indicate higher percent of this gene in all of this clone type are active. You can zoom and pan.";
+													  gene_graph.title = "Redder colours indicate higher average number of state changes of this gene in all occurences of this clone type. Size indicates the fraction active.";
 												   };
 								    var gene_graph = create_network_graph(callback, mutation_number, 800, 500);
 									add_network_graph(gene_graph, animation_and_graph_table, caption_html(default_colors[mutation_number-1]));						
@@ -491,11 +493,23 @@
             var colors = running_3D && replicate_states.length === 1 ? default_colors.map(function (color) {return rgb_to_hex(color)}) : default_colors;
             var animate_network = function (activation_fractions) {
             	var current_activation_fractions = activation_fractions[tick];
-            	var activation_color = function (fraction) {
-            		// given a number between 0 and 1 computes a color between white (0) and green (1)
-            		// square the fraction to make the differences more apparent 
-            		var shade = (1-fraction*fraction); 	
-            		return "rgba(" + Math.round(fraction*255) + ",127," + Math.round(shade*255) + ",1)";
+            	var change_count_color = function (change_count) {
+            		var hue;
+//             		if (change_count <= 1) {
+//             			// just by chance got the wrong value at the start 
+//             			change_count = 0;
+//             		}
+            		// if has high change count then should be 0 (red while low should be 120 (green)
+            		// any change count over 1 per 200 ticks is considered maximum
+            		return "hsl(" + (120-Math.min(120, change_count*120*200/tick)) + ",100%,33%)";
+//             		// given a number between 0 and 1 computes a color between white (0) and green (1)
+//             		// square the fraction to make the differences more apparent 
+//             		var shade = (1-fraction*fraction); 	
+//             		return "rgba(" + Math.round(fraction*255) + ",127," + Math.round(shade*255) + ",1)";
+            	};
+            	var activation_font = function (fraction) {
+            		// 100% if fraction is 1 and 50% if 0
+            		return gene_font_size/(2-fraction) + "px arial white";
             	};
             	if (!current_activation_fractions) {
             		// this is recorded every other tick so use previous one
@@ -506,7 +520,8 @@
             		network_graphs.forEach(function (network_graph, index) {
 											   var network_information = network_graph.network_information;
 											   var update_color = function (node_label) {
-												   var fraction = current_activation_fractions[index][node_label];
+												   var fraction = current_activation_fractions[index][node_label].a;
+												   var change_count = current_activation_fractions[index][node_label].c;
 												   var node_with_label;
 												   network_information.nodes.get().some(function (node) {
 													   if (node.label === node_label) {
@@ -515,8 +530,10 @@
 													   }
 												   });
 												   if (node_with_label) {
-												   	   node_with_label.color = activation_color(fraction);
-												       node_with_label.title = node_label + " is active in " + Math.round(100*fraction) + "% of the cells of this clone type.";
+												   	   node_with_label.color = change_count_color(change_count);
+												   	   node_with_label.font  = activation_font(fraction);
+												       node_with_label.title = node_label + " is active in " + Math.round(100*fraction)
+												                               + "% of the cells of this clone type. They changed an average " + change_count + " times.";
 												   	   network_information.nodes.update(node_with_label);
 												   }
 											   };
@@ -593,12 +610,12 @@
         display_frame();
     };
 
-    var create_network_graph = function (callback, mutation_number, width, height, gene_font, input_output_font) {
+    var create_network_graph = function (callback, mutation_number, width, height) {
  	    var options = {width:  width+"px",
  	                   height: height+"px",
  	                   edges: {arrows: 'to'},
 				       nodes: {color: 'yellow',
- 	                           font: gene_font || '16px arial white'},
+ 	                           font: gene_font_size + 'px arial white'},
  	                   // layout should not change on refresh or when comparing similar networks
  	                   layout: {randomSeed: 0}};
  	    var graph_div = document.createElement('div');
@@ -647,13 +664,13 @@
         input_nodes[mutation_number].forEach(function (node) {
         	node.color = 'pink';
         	node.shape = 'box';
-        	node.font = input_output_font || '24px arial';
+        	node.font = '24px arial';
         	node.physics = false;
         });
         output_nodes[mutation_number].forEach(function (node) {
         	node.color = 'orange';
         	node.shape = 'box';
-        	node.font = input_output_font || '24px arial';
+        	node.font = '24px arial';
         	node.physics = false;
         });
         nodes = new vis.DataSet(gene_nodes[mutation_number]);
