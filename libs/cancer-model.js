@@ -1,6 +1,6 @@
  /**
  * Implements the processing of logs from running the cancer model
- * Authors: Ken Kahn and Martin Hadley
+ * Authors: Ken Kahn, Martin Hadley, and Rowan Wilson
  * License: to be decided
  */
 
@@ -66,7 +66,6 @@
         var graph_row                 = document.createElement('tr');
         var animation_table_header    = document.createElement('td');
         var animation_table_cell      = document.createElement('td');
-        var graph_table_header        = document.createElement('td');
         var graph_table_cell          = document.createElement('td');
         var close_button              = document.createElement('button');
         var close_button_and_catption = document.createElement('div');
@@ -95,14 +94,8 @@
         	// stop the previous animation
         	previous_replicate_states_singleton[0] = null;
         }
-//         animation_and_graph_table.title = "Click to close this inspection of replicate #" + (index+1) + ".";
         caption.innerHTML = "<tr><td>Animation of replicate #" + (index+1) + " at time <span id='" + time_monitor_id + "'>0</span>.</td></tr>";
-//         animation_table_header.appendChild(caption);
-        graph_table_header.textContent = "Data from replicate #" + (index+1);
-//         animation_row.appendChild(animation_table_header);
-        graph_row.appendChild(graph_table_header);
         if (running_3D) {
-//             animation_row.appendChild(statistics_3D);
 			canvas_td.appendChild(webGL_output)
         } else {
             new_canvas = document.createElement('canvas');
@@ -501,7 +494,7 @@
 //             		}
             		// if has high change count then should be 0 (red while low should be 120 (green)
             		// any change count over 1 per 200 ticks is considered maximum
-            		return "hsl(" + (120-Math.min(120, change_count*120*200/tick)) + ",100%,33%)";
+            		return "hsl(" + (120-Math.min(120, change_count*120*100/tick)) + ",100%,33%)";
 //             		// given a number between 0 and 1 computes a color between white (0) and green (1)
 //             		// square the fraction to make the differences more apparent 
 //             		var shade = (1-fraction*fraction); 	
