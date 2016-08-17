@@ -521,15 +521,8 @@
 											   var network_information = network_graph.network_information;
 											   var update_color = function (node_label) {
 												   var fraction = current_activation_fractions[index][node_label].a;
-												   fraction = fraction / 100; // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 												   var change_count = current_activation_fractions[index][node_label].c;
-												   var node_with_label;
-												   network_information.nodes.get().some(function (node) {
-													   if (node.label === node_label) {
-														   node_with_label = node;
-														   return true;
-													   }
-												   });
+												   var node_with_label = find_node_with_label(node_label, network_information.nodes.get());
 												   if (node_with_label) {
 												   	   node_with_label.color = change_count_color(change_count);
 												   	   node_with_label.font  = activation_font(fraction);
@@ -680,6 +673,7 @@
 							     function () {
 										var container_center = network.DOMtoCanvas({x: center_x_dom, y: center_y_dom});
 										var scale = network.getScale();
+										var gene_nodes_of_unmutated_network, positions_of_gene_nodes_of_unmutated_network;
 										cell_outline.x = container_center.x;
 										cell_outline.y = container_center.y;
 										cell_outline.font = Math.round(radius/scale) + 'px arial';
@@ -708,7 +702,18 @@
 										nodes.add(input_nodes[mutation_number]);
 										nodes.add(output_nodes[mutation_number]);
 										update_gene_positions();
-										nodes.update(gene_nodes[mutation_number]);
+										if (mutation_number !== 1) {
+											gene_nodes_of_unmutated_network = network_graphs[1].network_information.gene_nodes[1];
+											positions_of_gene_nodes_of_unmutated_network = network_graphs[1].network_information.network.getPositions(gene_nodes_of_unmutated_network.map(function (node) { return node.id}));
+											gene_nodes[mutation_number].forEach(function (node) {
+												var position = positions_of_gene_nodes_of_unmutated_network[find_node_with_label(node.label, gene_nodes_of_unmutated_network).id];
+												node.x = position.x;
+												node.y = position.y;
+											});
+											nodes.update(gene_nodes[mutation_number]);
+										} else {
+											nodes.update(gene_nodes[mutation_number]);
+										}
 										callback();					
 								});
 		graph_div.network_information = {mutation_number: mutation_number,
@@ -770,6 +775,17 @@
         	addParagraph("<h2>Mutations</h2>", 'mutations');
         	addParagraph(mutations_file_contents);
         }
+    };
+
+    var find_node_with_label = function (node_label, nodes) {
+    	var node_with_label;
+		nodes.some(function (node) {
+					   if (node.label === node_label) {
+						   node_with_label = node;
+						   return true;
+					   }
+		           });
+		return node_with_label;
     };
 
     var display_mean = function(id, label, mean_values, standard_deviation_values) {
