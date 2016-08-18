@@ -698,7 +698,7 @@
 							     function () {
 										var container_center = network.DOMtoCanvas({x: center_x_dom, y: center_y_dom});
 										var scale = network.getScale();
-										var gene_nodes_of_unmutated_network, positions_of_gene_nodes_of_unmutated_network;
+										var scale_ratio, gene_nodes_of_unmutated_network, positions_of_gene_nodes_of_unmutated_network;
 										cell_outline.x = container_center.x;
 										cell_outline.y = container_center.y;
 										cell_outline.font = Math.round(radius/scale) + 'px arial';
@@ -728,12 +728,16 @@
 										nodes.add(output_nodes[mutation_number]);
 										update_gene_positions();
 										if (mutation_number !== 1) {
+											// mutated networks should have the same layout as the original network
+											if (scale_ratio === undefined) {
+												scale_ratio = network_graphs[1].network_information.network.getScale()/scale;
+											}
 											gene_nodes_of_unmutated_network = network_graphs[1].network_information.gene_nodes[1];
 											positions_of_gene_nodes_of_unmutated_network = network_graphs[1].network_information.network.getPositions(gene_nodes_of_unmutated_network.map(function (node) { return node.id}));
 											gene_nodes[mutation_number].forEach(function (node) {
 												var position = positions_of_gene_nodes_of_unmutated_network[find_node_with_label(node.label, gene_nodes_of_unmutated_network).id];
-												node.x = position.x;
-												node.y = position.y;
+												node.x = position.x*scale_ratio;
+												node.y = position.y*scale_ratio;
 											});
 											nodes.update(gene_nodes[mutation_number]);
 										} else {
