@@ -67,7 +67,8 @@
         var animation_table_header    = document.createElement('td');
         var animation_table_cell      = document.createElement('td');
         var graph_table_cell          = document.createElement('td');
-        var close_button              = document.createElement('button');
+        var close_button              = create_button("Remove inspection of replicate #" + (replicate_number+1),
+                                                      remove_canvas);
         var close_button_and_caption  = document.createElement('td');
         var caption = document.createElement('p');
         var graphs = document.createElement('div');
@@ -77,7 +78,7 @@
         	var tr2 = document.createElement('tr');
         	var td2 = document.createElement('td');
         	var caption_h3 = document.createElement('h3');
-        	var view_data_button = document.createElement('button');
+        	var button_label = "Copy network data to the clipboard";
         	var view_data_click_handler = function (event) {
         		var data = "Replicate\t\Mutation\tTime\tGene\tActivation\tAverage-changes\n";
         		view_data_button.textContent = "Please wait. This can take several seconds.";
@@ -89,16 +90,14 @@
 						});
 					}		
         		});
-        		copy_to_clipboard(data);
+        		copy_to_clipboard(data, "Data is on the clipboard. Copy it to a spreadsheet.");
         		view_data_button.textContent = button_label;
         		// tried window.prompt("Type Ctrl+C and Enter to copy to the clipboard. Then paste the data into a spreadsheet.", data);
         		// but there is a small size limit
         	};
-        	var button_label = "Copy network data to the clipboard"
-        	view_data_button.textContent = button_label;
-        	view_data_button.title = "Click to display the data used in the following network. Suitable for copying and pasting into a spreadsheet for further analysis.";
-        	view_data_button.addEventListener('click', view_data_click_handler);
-        	view_data_button.className = 'microc-button';
+        	var view_data_button = create_button(button_label,
+        	                                     view_data_click_handler,
+        	                                     "Click to copy the clipboard the data used in the following network. Suitable for pasting into a spreadsheet for further analysis.");
         	caption_h3.innerHTML = caption;
         	td1.appendChild(caption_h3);
         	caption_h3.appendChild(view_data_button);
@@ -146,25 +145,22 @@
 													      gene_graph.title = "Redder colours indicate higher average number of state changes of this gene in all occurences of this clone type. Size indicates the fraction active.";
 												      };
 								       var gene_graph = create_network_graph(callback, mutation_number, 800, 500);
-									   add_network_graph(gene_graph, animation_and_graph_table, caption_html(default_colors[mutation_number-1]), mutation_number, mutation_number-1);						
+									   add_network_graph(gene_graph, animation_and_graph_table, caption_html(default_colors[mutation_number-1], mutation_number-1), mutation_number-1);						
 				});
         	} else {
         		// already created network
 				network_graphs.forEach(function (gene_graph, index) {
-					                       add_network_graph(gene_graph, animation_and_graph_table, caption_html(default_colors[replicate_number], index+1), index);
+					                       add_network_graph(gene_graph, animation_and_graph_table, caption_html(default_colors[replicate_number], index), index);
 				});
         	}
         } 
         graph_row.appendChild(graphs);
         animation_and_graph_table.appendChild(graph_row);
-        close_button.textContent = "Close inspection of replicate #" + (replicate_number+1);
-        close_button.className = 'microc-button';
         graphs.id = "replicate-#" + replicate_number;
         // perhaps better to set the dimensions using the Plotly API
         graphs.style.width  = "600px";
         graphs.style.height = "400px";
         caption_element.parentElement.insertBefore(animation_and_graph_table, caption_element);
-        close_button.addEventListener('click', remove_canvas);
         // animate this single replicate at a larger size
         animate_cells(replicate_states_singleton, canvases_singleton, expanded_size, 20, false, 2, time_monitor_id);
         display_replicate(graphs.id, 
@@ -552,8 +548,6 @@
 												   var fraction = current_activation_fractions[index][node_label].a;
 												   var change_count = current_activation_fractions[index][node_label].c;
 												   var node_with_label = find_node_with_label(node_label, network_information.nodes.get());
-												   	fraction = fraction / 100; // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 												   if (node_with_label) {
 												   	   node_with_label.color = change_count_color(change_count);
 												   	   node_with_label.font  = activation_font(fraction);
@@ -758,7 +752,7 @@
     };
 
     var write_page = function () {
-        var addParagraph = function (html, id) {
+        var add_paragraph = function (html, id) {
             var p = document.createElement('p');
             p.innerHTML = html;
             if (id) {
@@ -766,45 +760,70 @@
             }
             document.body.appendChild(p);
         };
-        var addDiv = function (id) {
+        var add_div = function (id) {
             var div = document.createElement('div');
             div.id = id;
             document.body.appendChild(div);
         };
         var parameters_table = "<table class='parameters-table'><tr><th>Parameter</th><th>Value</th></tr>";
-        var i;
-        addParagraph("<h1>" + replicates.length + " out of " + number_of_replicates_requested + " results from running microC</h1>");
-        addParagraph("Submitted at " + start_time);
+        var link_text, i;
+        add_paragraph("<h1>" + replicates.length + " out of " + number_of_replicates_requested + " results from running microC</h1>");
+        add_paragraph("Submitted at " + start_time);
         if (typeof parameters !== 'undefined') {
-        	addParagraph("See <a href='#parameters'>the general settings</a>.");
+        	link_text = "See <a href='#parameters'>the general settings</a>.";
         }
         if (typeof mutations_file_contents !== 'undefined') {
-			addParagraph("See <a href='#mutations'>the mutation settings</a>.");
+			link_text += " See <a href='#mutations'>the mutation settings</a>.";
 	    }
-        addParagraph("<h2>Animation of cells</h2>");
+	    if (typeof associations_file_contents !== 'undefined') {
+	    	link_text += " See <a href='#other-settings'>other settings</a>.";
+	    }
+	    if (link_text) {
+	    	add_paragraph(link_text);
+	    }
+        add_paragraph("<h2>Animation of cells</h2>");
         // Dimitris suggested removing the following because it was confusing: Replay time is " + "<span id='canvases-time'>0</span>. 
-        addParagraph("To inspect an experimental replicate click on it.", "canvases-caption");
-        addDiv('canvases');
-        addParagraph("<h2>Averaged simulations results</h2>");
-        addDiv('mean-proliferation');
-        addDiv('mean-apoptosis');
-        addDiv('mean-growth_arrest');
-        addDiv('mean-necrosis');
-        addParagraph("<h2>All simulation results</h2>");
-        addDiv('all-proliferation');
-        addDiv('all-apoptosis');
-        addDiv('all-growth_arrest');
-        addDiv('all-necrosis');
+        add_paragraph("To inspect an experimental replicate click on it.", "canvases-caption");
+        add_div('canvases');
+        add_paragraph("<h2>Averaged simulations results</h2>");
+        add_div('mean-proliferation');
+        add_div('mean-apoptosis');
+        add_div('mean-growth_arrest');
+        add_div('mean-necrosis');
+        add_paragraph("<h2>All simulation results</h2>");
+        add_div('all-proliferation');
+        add_div('all-apoptosis');
+        add_div('all-growth_arrest');
+        add_div('all-necrosis');
         if (typeof parameters !== 'undefined') {
-			addParagraph("<h2>Settings</h2>", 'parameters');
+			add_paragraph("<h2>Settings</h2>", 'parameters');
 			for (i = 0; i < parameters.length; i += 2) {
 				parameters_table += "<tr><td>" + parameters[i] + "</td><td>" + parameters[i+1] + "</td></tr>";
 			}
-			addParagraph(parameters_table + '</table>');
+			add_paragraph(parameters_table + '</table>');
         }
         if (typeof mutations_file_contents !== 'undefined') {
-        	addParagraph("<h2>Mutations</h2>", 'mutations');
-        	addParagraph(mutations_file_contents);
+        	add_paragraph("<h2>Mutations</h2>", 'mutations');
+        	add_paragraph(mutations_file_contents);
+        }
+        if (typeof associations_file_contents !== 'undefined') {
+        	add_paragraph("<h2>Associations</h2>", 'other-settings');
+        	add_paragraph(associations_file_contents);
+        }
+        if (typeof diffusion_file_contents !== 'undefined') {
+        	add_paragraph("<h2>Diffusion parameters</h2>");
+        	add_paragraph(diffusion_file_contents);
+        }
+        if (typeof input_parameters_file_contents !== 'undefined') {
+        	add_paragraph("<h2>Input parameters</h2>");
+        	add_paragraph(input_parameters_file_contents);
+        }
+        if (typeof regulatory_graph_file_contents !== 'undefined') {
+        	document.body.appendChild(create_button("Copy regulatory graph to clipboard.",
+        	                                        function (event) {
+        	                                        	copy_to_clipboard(regulatory_graph_file_contents.replace("<br>", "\n"),
+        	                                        	                  "Paste the contents of the clipboard into a file named regulatoryGraph.html.");
+        	                                        }));
         }
     };
 
@@ -819,7 +838,7 @@
 		return node_with_label;
     };
 
-    var copy_to_clipboard = function (text) {
+    var copy_to_clipboard = function (text, success_message) {
     	  // based on http://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript
 		  var textArea = document.createElement("textarea");
 		  //
@@ -857,7 +876,7 @@
 		  textArea.select();
 		  try {
 			if (document.execCommand('copy')) {
-				alert("Data is on the clipboard. Copy it to a spreadsheet.")
+				alert(success_message)
 			} else {
 				alert("This browser failed to put the data on clipboard. Data in next alert.");
 			    alert(text);
@@ -867,6 +886,19 @@
 			alert(text);
 		  }
 		  document.body.removeChild(textArea);
+	};
+
+	var create_button = function (label, click_listener, title) {
+		var button = document.createElement('button');
+		button.textContent = label;
+        button.className = 'microc-button';
+        if (title) {
+        	button.title = title;
+        }
+        if (click_listener) {
+        	button.addEventListener('click', click_listener);
+        }
+        return button;
 	};
 
     var display_mean = function(id, label, mean_values, standard_deviation_values) {
