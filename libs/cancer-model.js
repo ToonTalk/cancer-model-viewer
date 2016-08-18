@@ -46,6 +46,10 @@
 
     var gene_font_size = 24;                        // maximum font size if active 100% of the time
 
+    var element_width  = 800;
+
+    var element_height = 500;
+
     var scene, camera, renderer, 
         statistics_3D, webGL_output;                // for displaying 3D
 
@@ -56,7 +60,7 @@
         var replicate_number = canvases.indexOf(event.target);
         var replicate_states_singleton = [replicate_states[replicate_number]];
         var caption_element = document.getElementById('canvases-caption');
-        var remove_canvas = function () {
+        var remove_replicate = function () {
             animation_and_graph_table.parentElement.removeChild(animation_and_graph_table);
             replicate_states_singleton[0] = null; // to stop the animation
         }
@@ -68,7 +72,7 @@
         var animation_table_cell      = document.createElement('td');
         var graph_table_cell          = document.createElement('td');
         var close_button              = create_button("Remove inspection of replicate #" + (replicate_number+1),
-                                                      remove_canvas);
+                                                      remove_replicate);
         var close_button_and_caption  = document.createElement('td');
         var caption = document.createElement('p');
         var graphs = document.createElement('div');
@@ -131,9 +135,10 @@
             canvases_singleton = [new_canvas];
             canvas_td.appendChild(new_canvas);
         }
-        animation_row.appendChild(canvas_td);
-        close_button_and_caption.appendChild(caption);
         close_button_and_caption.appendChild(close_button);
+        close_button_and_caption.appendChild(caption);
+        animation_row.appendChild(canvas_td);
+        animation_and_graph_table.className = 'microc-replicate-inspection';
         animation_and_graph_table.appendChild(close_button_and_caption);
         animation_and_graph_table.appendChild(animation_row);
         if (typeof gene_nodes !== 'undefined') {
@@ -144,7 +149,7 @@
 											              network_graphs[mutation_number] = gene_graph;
 													      gene_graph.title = "Redder colours indicate higher average number of state changes of this gene in all occurences of this clone type. Size indicates the fraction active.";
 												      };
-								       var gene_graph = create_network_graph(callback, mutation_number, 800, 500);
+								       var gene_graph = create_network_graph(callback, mutation_number, element_width, element_height);
 									   add_network_graph(gene_graph, animation_and_graph_table, caption_html(default_colors[mutation_number-1], mutation_number-1), mutation_number-1);						
 				});
         	} else {
@@ -158,8 +163,8 @@
         animation_and_graph_table.appendChild(graph_row);
         graphs.id = "replicate-#" + replicate_number;
         // perhaps better to set the dimensions using the Plotly API
-        graphs.style.width  = "600px";
-        graphs.style.height = "400px";
+        graphs.style.width  = element_width  + "px";
+        graphs.style.height = element_height + "px";
         caption_element.parentElement.insertBefore(animation_and_graph_table, caption_element);
         // animate this single replicate at a larger size
         animate_cells(replicate_states_singleton, canvases_singleton, expanded_size, 20, false, 2, time_monitor_id);
@@ -172,7 +177,7 @@
         previous_replicate_states_singleton = replicate_states_singleton;
     };
 
-    var initialize = function () {
+    var initialise = function () {
         var mean = function (tick, values) {
             var sums = [];
             var sample_count = 0;
@@ -579,8 +584,9 @@
                 	}
                     return; // this replicate is finished
                 }
-                if (running_3D && replicate_states.length === 1) {             
-                    renderer.setSize(2*(2+maximum_x-minimum_x)*scale, 2*(2+maximum_y-minimum_y)*scale);
+                if (running_3D && replicate_states.length === 1) { 
+                    renderer.setSize(Math.min(element_width, element_height), Math.min(element_width, element_height));           
+//                     renderer.setSize(2*(2+maximum_x-minimum_x)*scale, 2*(2+maximum_y-minimum_y)*scale);
                 } else {
                     canvas = canvases[index];
                     // set canvas size as just a little bit bigger than needed
@@ -1061,7 +1067,7 @@
         display_cell,   // function to display a cell
         clear_all;      // function to clear all displays
 
-    // initialize when the page has been loaded
-    document.addEventListener('DOMContentLoaded', initialize);
+    // initialise when the page has been loaded
+    document.addEventListener('DOMContentLoaded', initialise);
 
  }());

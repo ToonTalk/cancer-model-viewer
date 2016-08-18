@@ -35,3 +35,7 @@ body {
 	font-size: 16px;
 	padding: 6px;
 }
+
+.microc-replicate-inspection {
+	background-color: rgb(253,253,255);
+}
