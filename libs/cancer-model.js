@@ -605,7 +605,9 @@
                      }
                      display_cell(cell, scale, radius, color);
                 });
-                animate_network(log.a);
+                if (log.a) {
+                	animate_network(log.a);
+                }
             });
             if (running_3D && replicate_states.length === 1) {
                 renderer.render(scene, camera);
