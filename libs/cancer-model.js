@@ -155,7 +155,7 @@
         	} else {
         		// already created network
 				network_graphs.forEach(function (gene_graph, index) {
-					                       add_network_graph(gene_graph, animation_and_graph_table, caption_html(default_colors[replicate_number], index), index);
+					                       add_network_graph(gene_graph, animation_and_graph_table, caption_html(default_colors[replicate_number], index-1), index-1);
 				});
         	}
         } 
