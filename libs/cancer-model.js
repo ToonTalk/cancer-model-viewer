@@ -150,12 +150,12 @@
 													      gene_graph.title = "Redder colours indicate higher average number of state changes of this gene in all occurences of this clone type. Size indicates the fraction active.";
 												      };
 								       var gene_graph = create_network_graph(callback, mutation_number, element_width, element_height);
-									   add_network_graph(gene_graph, animation_and_graph_table, caption_html(default_colors[mutation_number-1], mutation_number-1), mutation_number-1);						
+									   add_network_graph(gene_graph, animation_and_graph_table, caption_html(default_colors[mutation_number-1], mutation_number-1), mutation_number);						
 				});
         	} else {
         		// already created network
 				network_graphs.forEach(function (gene_graph, index) {
-					                       add_network_graph(gene_graph, animation_and_graph_table, caption_html(default_colors[index-1], index-1), index-1);
+					                       add_network_graph(gene_graph, animation_and_graph_table, caption_html(default_colors[index-1], index-1), index);
 				});
         	}
         } 
@@ -890,7 +890,7 @@
 			if (document.execCommand('copy')) {
 				alert(success_message)
 			} else {
-				alert("This browser failed to put the data on clipboard. Data in next alert.");
+				alert("This browser failed to put the data on clipboard. Data is in next alert.");
 			    alert(text);
 			}
 		  } catch (error) {
