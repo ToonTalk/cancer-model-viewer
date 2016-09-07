@@ -122,7 +122,32 @@
         	return circle + " " + caption;
         };
         var canvas_td = document.createElement('td');
-        var new_canvas, canvases_singleton;
+        var add_data_graphs = function () {
+        	animation_and_graph_table.appendChild(graph_row);
+			animate_cells(replicate_states_singleton, canvases_singleton, expanded_size, 20, false, 2, time_monitor_id);
+			display_replicate(graphs.id, 
+				"Cell events for replicate #" + (replicate_number+1),
+				replicate_proliferation_values[replicate_number],
+				replicate_apoptosis_values[replicate_number],
+				replicate_growth_arrest_values[replicate_number],
+				replicate_necrosis_values[replicate_number]);
+		};
+        var process_network = function (mutation_index) {
+        	var callback = function () {
+								network_graphs[mutation_number] = gene_graph;
+								gene_graph.title = "Redder colours indicate higher average number of state changes of this gene in all occurences of this clone type. Size indicates the fraction active.";
+								if (mutation_index < mutation_numbers.length-1) {
+									process_network(mutation_index+1);
+								} else {
+									// all network graphs taken care of now add data graphs
+									add_data_graphs();
+								};
+        	};
+	        var mutation_number = parseInt(mutation_numbers[mutation_index]);
+			var gene_graph = create_network_graph(callback, mutation_number, element_width, element_height);
+			add_network_graph(gene_graph, animation_and_graph_table, caption_html(default_colors[mutation_number-1], mutation_number-1), mutation_number);
+        };
+        var new_canvas, canvases_singleton, mutation_numbers, fresh_network_graphs;
         if (previous_replicate_states_singleton) {
         	// stop the previous animation
         	previous_replicate_states_singleton[0] = null;
@@ -144,14 +169,10 @@
         if (typeof gene_nodes !== 'undefined') {
         	if (network_graphs.length === 0) {
 				// gene_nodes has the gene_nodes of each clone type (i.e. mutation_number)
-				gene_nodes.forEach(function (ignore, mutation_number) {
-									   var callback = function () {
-											              network_graphs[mutation_number] = gene_graph;
-													      gene_graph.title = "Redder colours indicate higher average number of state changes of this gene in all occurences of this clone type. Size indicates the fraction active.";
-												      };
-								       var gene_graph = create_network_graph(callback, mutation_number, element_width, element_height);
-									   add_network_graph(gene_graph, animation_and_graph_table, caption_html(default_colors[mutation_number-1], mutation_number-1), mutation_number);						
-				});
+				// sort them so that the first one is processed since others copy its layout
+				fresh_network_graphs = true;
+				mutation_numbers = Object.keys(gene_nodes).sort();
+				process_network(0);									   						
         	} else {
         		// already created network
 				network_graphs.forEach(function (gene_graph, index) {
@@ -160,20 +181,15 @@
         	}
         } 
         graph_row.appendChild(graphs);
-        animation_and_graph_table.appendChild(graph_row);
         graphs.id = "replicate-#" + replicate_number;
         // perhaps better to set the dimensions using the Plotly API
         graphs.style.width  = element_width  + "px";
         graphs.style.height = element_height + "px";
         caption_element.parentElement.insertBefore(animation_and_graph_table, caption_element);
         // animate this single replicate at a larger size
-        animate_cells(replicate_states_singleton, canvases_singleton, expanded_size, 20, false, 2, time_monitor_id);
-        display_replicate(graphs.id, 
-                          "Cell events for replicate #" + (replicate_number+1),
-                          replicate_proliferation_values[replicate_number],
-                          replicate_apoptosis_values[replicate_number],
-                          replicate_growth_arrest_values[replicate_number],
-                          replicate_necrosis_values[replicate_number]);
+        if (!fresh_network_graphs) {
+        	add_data_graphs();
+        }
         previous_replicate_states_singleton = replicate_states_singleton;
     };
 
