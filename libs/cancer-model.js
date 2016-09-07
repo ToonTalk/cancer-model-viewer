@@ -44,7 +44,7 @@
 
     var expanded_size = 16;                         // size when running expanded
 
-    var gene_font_size = 24;                        // maximum font size if active 100% of the time
+    var gene_font_size = 18;                        // default font size
 
     var element_width  = 800;
 
@@ -135,7 +135,7 @@
         var process_network = function (mutation_index) {
         	var callback = function () {
 								network_graphs[mutation_number] = gene_graph;
-								gene_graph.title = "Redder colours indicate higher average number of state changes of this gene in all occurences of this clone type. Size indicates the fraction active.";
+								gene_graph.title = "Greener colours indicate the fraction active across all instances of the gene for this mutation type.";
 								if (mutation_index < mutation_numbers.length-1) {
 									process_network(mutation_index+1);
 								} else {
@@ -539,24 +539,27 @@
             var colors = running_3D && replicate_states.length === 1 ? default_colors.map(function (color) {return rgb_to_hex(color)}) : default_colors;
             var animate_network = function (activation_fractions) {
             	var current_activation_fractions = activation_fractions[tick];
-            	var change_count_color = function (change_count) {
-            		var hue;
-//             		if (change_count <= 1) {
-//             			// just by chance got the wrong value at the start 
-//             			change_count = 0;
-//             		}
-            		// if has high change count then should be 0 (red while low should be 120 (green)
-            		// any change count over 1 per 200 ticks is considered maximum
-            		return "hsl(" + (120-Math.min(120, change_count*120*100/tick)) + ",100%,33%)";
-//             		// given a number between 0 and 1 computes a color between white (0) and green (1)
-//             		// square the fraction to make the differences more apparent 
-//             		var shade = (1-fraction*fraction); 	
-//             		return "rgba(" + Math.round(fraction*255) + ",127," + Math.round(shade*255) + ",1)";
-            	};
-            	var activation_font = function (fraction) {
-            		// 100% if fraction is 1 and 50% if 0
-            		return gene_font_size/(2-fraction) + "px arial white";
-            	};
+//             	var change_count_color = function (change_count) {
+//             		var hue;
+// //             		if (change_count <= 1) {
+// //             			// just by chance got the wrong value at the start 
+// //             			change_count = 0;
+// //             		}
+//             		// if has high change count then should be 0 (red while low should be 120 (green)
+//             		// any change count over 1 per 200 ticks is considered maximum
+//             		return "hsl(" + (120-Math.min(120, change_count*120*100/tick)) + ",100%,33%)";
+// //             		// given a number between 0 and 1 computes a color between white (0) and green (1)
+// //             		// square the fraction to make the differences more apparent 
+// //             		var shade = (1-fraction*fraction); 	
+// //             		return "rgba(" + Math.round(fraction*255) + ",127," + Math.round(shade*255) + ",1)";
+//             	};
+				var activation_color = function (fraction) {
+            		return "hsl(" + 120*fraction + ",100%,33%)";
+				}
+//             	var activation_font = function (fraction) {
+//             		// 100% if fraction is 1 and 50% if 0
+//             		return gene_font_size/(2-fraction) + "px arial white";
+//             	};
             	if (!current_activation_fractions) {
             		// this is recorded every other tick so use previous one
             		current_activation_fractions = activation_fractions[tick-1];
@@ -570,8 +573,9 @@
 												   var change_count = current_activation_fractions[index][node_label].c;
 												   var node_with_label = find_node_with_label(node_label, network_information.nodes.get());
 												   if (node_with_label) {
-												   	   node_with_label.color = change_count_color(change_count);
-												   	   node_with_label.font  = activation_font(fraction);
+												   	   node_with_label.color = activation_color(fraction);
+// 												   	   node_with_label.color = change_count_color(change_count);
+// 												   	   node_with_label.font  = activation_font(fraction);
 												       node_with_label.title = node_label + " is active in " + Math.round(100*fraction)
 												                               + "% of the cells of this clone type. They changed an average " + change_count + " times.";
 												   	   network_information.nodes.update(node_with_label);
