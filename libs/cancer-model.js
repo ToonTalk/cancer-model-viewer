@@ -116,6 +116,8 @@
         	var caption;
         	if (mutation_number === 0) {
 				caption = "Network for unmutated cells. ";
+        	} else if (typeof mutation_names !== 'undefined' && mutation_names.length > 0) {
+        		caption = "Network for mutated cells of type " + mutation_names[mutation_number] + ". ";
         	} else {
         		caption = "Network for mutated cells of type " + mutation_number + ". ";
         	}
