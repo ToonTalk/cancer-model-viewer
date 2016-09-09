@@ -114,12 +114,10 @@
         var caption_html = function (color, mutation_number) {
         	var circle = "<div style=';display:inline-block;width:32px;height:32px;border-radius:32px;background-color:" + color + ";'> </div>";
         	var caption;
-        	if (mutation_number === 0) {
-				caption = "Network for unmutated cells. ";
-        	} else if (typeof mutation_names !== 'undefined' && mutation_names.length > 0) {
-        		caption = "Network for mutated cells of type " + mutation_names[mutation_number] + ". ";
+        	if (typeof mutation_names !== 'undefined' && mutation_names.length > 0) {
+        		caption = "Network for cells of type " + mutation_names[mutation_number] + " ";
         	} else {
-        		caption = "Network for mutated cells of type " + mutation_number + ". ";
+        		caption = "Network for cells of type " + mutation_number + " ";
         	}
         	return circle + " " + caption;
         };
