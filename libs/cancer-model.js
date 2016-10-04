@@ -46,6 +46,10 @@
 
     var gene_font_size = 18;                        // default font size
 
+    var input_node_font_size  = 24;
+
+    var output_node_font_size = 24;
+
     var element_width  = 800;
 
     var element_height = 500;
@@ -709,13 +713,13 @@
         input_nodes[mutation_number].forEach(function (node) {
         	node.color = 'pink';
         	node.shape = 'box';
-        	node.font = '24px arial';
+        	node.font = input_node_font_size + 'px arial';
         	node.physics = false;
         });
         output_nodes[mutation_number].forEach(function (node) {
         	node.color = 'orange';
         	node.shape = 'box';
-        	node.font = '24px arial';
+        	node.font = output_node_font_size + 'px arial';
         	node.physics = false;
         });
         nodes = new vis.DataSet(gene_nodes[mutation_number]);
@@ -766,8 +770,18 @@
 												var position = positions_of_gene_nodes_of_unmutated_network[find_node_with_label(node.label, gene_nodes_of_unmutated_network).id];
 												node.x = position.x*scale_ratio;
 												node.y = position.y*scale_ratio;
+												// node size may be scaled differently from original network so scale font size as well
+												node.font = gene_font_size*scale_ratio + 'px arial white';
 											});
 											nodes.update(gene_nodes[mutation_number]);
+											input_nodes[mutation_number].forEach(function (node) {
+												node.font = input_node_font_size*scale_ratio + 'px arial';
+											});
+											nodes.update(input_nodes[mutation_number]);
+											output_nodes[mutation_number].forEach(function (node) {
+												node.font = output_node_font_size*scale_ratio + 'px arial';
+											});
+											nodes.update(output_nodes[mutation_number]);
 										} else {
 											nodes.update(gene_nodes[mutation_number]);
 										}
