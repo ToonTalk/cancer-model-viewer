@@ -811,6 +811,11 @@
             div.id = id;
             document.body.appendChild(div);
         };
+        var add_footer = function () {
+        	var footer = document.createElement('footer');
+        	footer.textContent = "Copyright © University of Oxford 2016. All rights reserved";
+        	document.body.appendChild(footer);
+        }
         var parameters_table = "<table class='parameters-table'><tr><th>Parameter</th><th>Value</th></tr>";
         var link_text, i;
         add_paragraph("<h1>" + replicates.length + " out of " + number_of_replicates_requested + " results from running microC</h1>");
@@ -871,6 +876,7 @@
         	                                        	                  "Paste the contents of the clipboard into a file named regulatoryGraph.html.");
         	                                        }));
         }
+        add_footer();
     };
 
     var find_node_with_label = function (node_label, nodes) {
